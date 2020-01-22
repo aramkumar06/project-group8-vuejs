@@ -1,4 +1,4 @@
-FROM tomcat:8.0.51-jre7-alpine
+FROM tomcat:latest
 ENV TZ=Asia/Seoul
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN rm -Rf /usr/local/tomcat/webapps/ROOT

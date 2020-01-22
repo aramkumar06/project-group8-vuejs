@@ -4,8 +4,10 @@
 <configuration>
 	<typeAliases>
 		<typeAlias type="com.ssafy.model.dto.Youtuber"	alias="youtuber"/>
+		<typeAlias type="com.ssafy.model.dto.Category"	alias="category"/>
 	</typeAliases>
 	<mappers>
 		<mapper resource="mapper/Youtuber_query.xml"/>
+		<mapper resource="mapper/Category_query.xml"/>
 	</mappers>
 </configuration>

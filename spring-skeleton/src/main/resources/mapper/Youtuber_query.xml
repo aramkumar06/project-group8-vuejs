@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.ssafy.model.dao.YoutuberDao">
+
+	<!-- 여러개가 나오더라도 resultType에는 리스트 형으로 쓰지 않는다. -->
+	<select id="search" parameterType="String" resultType="youtuber">
+		select *
+		from YOUTUBER
+		where channelName like concat('%', #{name}, '%')
+		 or youtuberName like concat('%', #{name}, '%')
+		order by subscriber desc;
+	</select>
+
+	<select id="searchAll" resultType="youtuber">
+		select * from YOUTUBER
+	</select>
+
+	<insert id="insert" parameterType="youtuber">
+		insert into YOUTUBER (id, value)
+		values ( #{id:INTEGER}
+		,#{value:VARCHAR})
+	</insert>
+</mapper>

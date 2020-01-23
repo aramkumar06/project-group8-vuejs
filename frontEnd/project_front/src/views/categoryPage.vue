@@ -2,7 +2,10 @@
   <!-- vuetify를 참고하여 작성하기
   https://vuetifyjs.com/ko/components/api-explorer
   -->
-  <div>categoryPage</div>
+  <div>
+    <h1>categoryPage</h1>
+    <h1>{{category}}</h1>
+  </div>
 </template>
 
 <script>
@@ -14,7 +17,7 @@ export default {
   methods: {},
   computed: {},
   data() {
-    return {};
+    return { category : this.$route.params.cate};
   }
 };
 </script>

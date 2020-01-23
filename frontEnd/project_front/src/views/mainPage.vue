@@ -3,53 +3,69 @@
   https://vuetifyjs.com/ko/components/api-explorer
   -->
   <div>
-    <header-component></header-component>
-  
-    <v-btn large color="error" type="button" @click="tmpFunction()">
-      back에 no 3으로 testID값 얻기 위해 GET요청 보내기
-    </v-btn>
-    <br />
-    testID : "{{ testID }}"
-    <br />
-    <input
-      type="button"
-      value="router를 활용해서 tmpPage2로 이동하기"
-      @click="tmpMove()"
-    />
-    <br />
-    <footer-Component></footer-Component>
+    <banner />
+  <v-container >
+    <v-layout wrap>
+      <v-flex 
+        v-for="(category,i) in categories"
+        :key = i
+        xs12
+        md4
+        class="pa-3"
+        
+        >
+        <v-responsive :aspect-ratio="1/1">
+        <v-btn 
+        block 
+        :aspect-ratio="1/1"
+        :to= "{ name: 'categoryPage', params: { cate: category.nameEng }}"
+        height="100%"
+        >
+        <v-img
+          :src="require('@/assets/logo.png')"
+        >
+        <h1> {{category.nameEng}} </h1>
+
+        </v-img>
+      </v-btn>
+      </v-responsive>
+      
+      </v-flex>
+
+    </v-layout>
+    
+    <h1 v-for=" a in  tmp" :key="a">
+      아 진짜 하기 싫다
+    </h1>
+
+  </v-container>
   </div>
 </template>
 
 <script>
-import Constant from "../vuex/Constant";
-import headerComponent from "../components/headerComponent";
-import footerComponent from "../components/footerComponent";
+import banner from "../components/banner";
+import {
+    mapGetters
+}from 'vuex'
+
 
 export default {
-  components: {  headerComponent , footerComponent},
+  components: { banner },
   name: "mainPage",
-
-  created() {},
-  methods: {
-    tmpFunction() {
-      this.$store.dispatch(Constant.GET_TEST, {
-        no: 3
-      });
-    },
-    tmpMove() {
-      this.$router.push("/categoryPage");
-    }
-  },
+  methods: { },
   computed: {
-    testID() {
-      return this.$store.state.testID;
-    }
+    ...mapGetters(['categories'])
   },
   data() {
-    return {};
+    return {
+      tmp : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      layout: [2, 2, 1, 2, 2, 3, 3, 3, 3, 3, 3]
+    };
   }
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+
+
+</style>

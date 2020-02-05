@@ -1,0 +1,59 @@
+[
+{
+ "model": "dataServer.video",
+ "pk": 1,
+ "fields": {
+  "yno": 1,
+  "videoid": null,
+  "videoname": "\uc5d0\ubc84\ub79c\ub4dc",
+  "videodescription": "\uc7a1\uac83\ub4e4~\uc5d0\ubc84\ub79c\ub4dc\ud3b8\uc774\uc57c~~~",
+  "videoviewcount": 123,
+  "videocommentcount": 213,
+  "good": 122,
+  "bad": 32,
+  "regdate": "2019-12-12",
+  "ycano": 1,
+  "tags": "\uc790\ucde8, \uc0c1\ubbfc, \uc2ac\ub9ac\ud37c",
+  "thumbnail": null,
+  "topic": null
+ }
+},
+{
+ "model": "dataServer.video",
+ "pk": 2,
+ "fields": {
+  "yno": 1,
+  "videoid": null,
+  "videoname": "\uba54\uac00\ubc15\uc2a4",
+  "videodescription": "\uba54\uac00\ubc15\uc2a4 ~",
+  "videoviewcount": 111,
+  "videocommentcount": 21,
+  "good": 32,
+  "bad": 4,
+  "regdate": "2019-12-31",
+  "ycano": 15,
+  "tags": "\uc790\ucde8, \uae30\ud658, \ud53c\uace4",
+  "thumbnail": null,
+  "topic": null
+ }
+},
+{
+ "model": "dataServer.video",
+ "pk": 3,
+ "fields": {
+  "yno": 3,
+  "videoid": null,
+  "videoname": "\uba39\ubc29",
+  "videodescription": "\uba39\ubc29",
+  "videoviewcount": 3,
+  "videocommentcount": 3,
+  "good": 3,
+  "bad": 234,
+  "regdate": "2020-01-01",
+  "ycano": 17,
+  "tags": "\uc2ac\ub9ac\ud37c, \uc9d1\ub4e4\uc774",
+  "thumbnail": null,
+  "topic": null
+ }
+}
+]

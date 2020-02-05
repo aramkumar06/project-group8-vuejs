@@ -1,0 +1,59 @@
+[
+	{
+		"pk": 1,
+		"model": "dataServer.video",
+		"fields": {
+			"tags": "자취, 상민, 슬리퍼",
+			"videocommentcount": 213,
+			"topic": null,
+			"videodescription": "잡것들~에버랜드편이야~~~",
+			"videoviewcount": 123,
+			"good": 122,
+			"bad": 32,
+			"yno": 1,
+			"videoname": "에버랜드",
+			"regdate": "2019-12-12",
+			"ycano": 1,
+			"thumbnail": null,
+			"videoid": null
+		}
+	},
+	{
+		"pk": 2,
+		"model": "dataServer.video",
+		"fields": {
+			"tags": "자취, 기환, 피곤",
+			"videocommentcount": 21,
+			"topic": null,
+			"videodescription": "메가박스 ~",
+			"videoviewcount": 111,
+			"good": 32,
+			"bad": 4,
+			"yno": 1,
+			"videoname": "메가박스",
+			"regdate": "2019-12-31",
+			"ycano": 15,
+			"thumbnail": null,
+			"videoid": null
+		}
+	},
+	{
+		"pk": 3,
+		"model": "dataServer.video",
+		"fields": {
+			"tags": "슬리퍼, 집들이",
+			"videocommentcount": 3,
+			"topic": null,
+			"videodescription": "먹방",
+			"videoviewcount": 3,
+			"good": 3,
+			"bad": 234,
+			"yno": 3,
+			"videoname": "먹방",
+			"regdate": "2020-01-01",
+			"ycano": 17,
+			"thumbnail": null,
+			"videoid": null
+		}
+	}
+]

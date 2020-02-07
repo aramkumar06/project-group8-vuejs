@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.model.dao.UserDao">
+
+	<!-- 여러개가 나오더라도 resultType에는 리스트 형으로 쓰지 않는다 -->
+
+	<!-- 회원 등록  -->
+	<insert id="insertUser" parameterType="user">
+		insert into user (userID, userEmail, userName, regDate)
+		values (#{userID}, #{userEmail}, #{userName}, now())
+	</insert>
+	
+	<!-- userID로 회원정보 조회 -->
+	<select id="search" parameterType="String" resultType="user">
+		select *
+		from user
+		where userID=#{userID}
+	</select>
+	
+	<!-- userID로 사용자가 즐겨찾기 한 유투버 정보 검색 -->
+	<select id="searchUserFavoriteYoutuber" parameterType="String" resultType="youtuber">
+		select *
+		from youtuber y
+		inner join (select f.yno
+					from user us
+					inner join favorite f
+					using (usno)
+					where us.userID = #{userID}) usinfo
+		using (yno);
+	</select>
+	
+	<!-- userID로  이미 가입되어 있는 사용자인지를 조회 -->
+	<select id="searchUserExist" parameterType="String" resultType="int">
+		select count(*) userNum
+		from user
+		where userID=#{userID}
+	</select>
+</mapper>

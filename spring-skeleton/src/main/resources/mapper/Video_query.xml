@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.model.dao.VideoDao">
+
+	<!-- 여러개가 나오더라도 resultType에는 리스트 형으로 쓰지 않는다 -->
+
+	<!-- video 고유번호로 영상 정보 검색 -->
+	<select id="search" parameterType="int" resultType="video">
+		select *
+		from video v inner join youtube_category yc
+		using (ycano)
+		where v.vno=#{vno}
+	</select>
+	
+		<!-- 키워드로 video 정보 검색 / 조회수 순으로 -->
+	<select id="searchKeyword" parameterType="String" resultType="video">
+		select *
+		from video v inner join youtube_category yc
+		using (ycano)
+		where videoName like concat('%', #{keyword}, '%')
+		 or videoDescription like concat('%', #{keyword}, '%')
+		 or tags like concat('%', #{keyword}, '%')
+		order by videoViewCount desc
+	</select>
+	
+	<!-- 전체 video 조회 / 조회수 순으로 -->
+	<select id="searchAll" resultType="video">
+		select *
+		from video v inner join youtube_category yc
+		using (ycano)
+		order by v.videoViewCount desc
+	</select>
+	
+	<!-- 정렬 조건에 따른 video 랭킹 조회. searchCondition이 정렬 조건, num이 가져올 개수 -->
+	<select id="searchRanking" parameterType="java.util.Map" resultType="video">
+		select *
+		from video v inner join youtube_category yc
+		using (ycano)
+		<if test="searchCondition != null">
+			<choose>
+				<when test="searchCondition == 'videoViewCount'">
+					order by v.videoViewCount desc limit ${num}
+				</when>
+				<when test="searchCondition == 'videoCommentCount'">
+					order by v.videoCommentCount desc limit ${num}
+				</when>
+				<when test="searchCondition == 'good'">
+					order by v.good desc limit ${num}
+				</when>
+				<when test="searchCondition == 'bad'">
+					order by v.bad desc limit ${num}
+				</when>
+				<when test="searchCondition == 'regDate'">
+					order by v.regDate desc limit ${num}
+				</when>
+				<otherwise>
+					limit 0
+				</otherwise>
+			</choose>
+		</if>
+	</select>
+</mapper>

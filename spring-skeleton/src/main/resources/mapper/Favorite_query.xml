@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.model.dao.FavoriteDao">
+
+	<!-- 여러개가 나오더라도 resultType에는 리스트 형으로 쓰지 않는다 -->
+
+	<!-- 즐겨찾기 추가  -->
+	<insert id="insertFavorite" parameterType="favorite">
+		insert into favorite (yno, usno, regDate)
+		values (#{yno:INTEGER}, #{usno:INTEGER}, now())
+	</insert>
+	
+	<!-- 즐겨찾기 삭제 -->
+	<delete id="deleteFavorite" parameterType="java.util.Map">
+		delete from favorite
+		where yno=#{yno} and usno=#{usno};
+	</delete>
+
+	<!-- user 고유번호로 사용자가 즐겨찾기 한 유투버 정보 검색 -->
+	<select id="searchUserFavoriteYoutuber" parameterType="int" resultType="youtuber">
+		select *
+		from favorite f
+		left join youtuber y
+		using (yno)
+		where f.usno=#{usno}
+	</select>
+
+	<!-- 유투버 고유번호로 해당 유투버를 즐겨찾기 한 사람 수 조회 -->
+	<select id="searchYoutuberFavoriteNum" parameterType="int" resultType="int">
+		select count(*)
+		from favorite
+		where yno=#{yno}
+	</select>
+</mapper>

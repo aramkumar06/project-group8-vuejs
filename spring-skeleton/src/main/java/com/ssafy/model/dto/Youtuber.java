@@ -4,12 +4,12 @@ import java.sql.Date;
 
 public class Youtuber {
 	private int yno;
+	private String channelID;
 	private String channelName;
 	private String youtuberName;
 	private String channelDescription;
-	private String namuwiki;
-	private String instagram;
-	private String facebook;
+	private String bannerImageLink;
+	private String channelLink;
 	private String thumbnails;
 	private Date publishedDate;
 	private int subscriber;
@@ -18,17 +18,31 @@ public class Youtuber {
 	private String grade;
 	private int influence;
 	private int activity;
-	private int growth;
-	private int basicStat;
+	private int viewCountTrend;
+	private int subscriberCountTrend;
 	private int charm;
 	private int clickCount;
-	private Date updateDate;
+	private Date updatedDate;
 	private Date regDate;
+	private String otherLink1;
+	private String otherLink2;
+	private String otherLink3;
+	private String otherLink4;
+	private String otherLink5;
+	private String uploadsID;
+	private String searchKeyword;
+	
 	public int getYno() {
 		return yno;
 	}
 	public void setYno(int yno) {
 		this.yno = yno;
+	}
+	public String getChannelID() {
+		return channelID;
+	}
+	public void setChannelID(String channelID) {
+		this.channelID = channelID;
 	}
 	public String getChannelName() {
 		return channelName;
@@ -48,23 +62,17 @@ public class Youtuber {
 	public void setChannelDescription(String channelDescription) {
 		this.channelDescription = channelDescription;
 	}
-	public String getNamuwiki() {
-		return namuwiki;
+	public String getBannerImageLink() {
+		return bannerImageLink;
 	}
-	public void setNamuwiki(String namuwiki) {
-		this.namuwiki = namuwiki;
+	public void setBannerImageLink(String bannerImageLink) {
+		this.bannerImageLink = bannerImageLink;
 	}
-	public String getInstagram() {
-		return instagram;
+	public String getChannelLink() {
+		return channelLink;
 	}
-	public void setInstagram(String instagram) {
-		this.instagram = instagram;
-	}
-	public String getFacebook() {
-		return facebook;
-	}
-	public void setFacebook(String facebook) {
-		this.facebook = facebook;
+	public void setChannelLink(String channelLink) {
+		this.channelLink = channelLink;
 	}
 	public String getThumbnails() {
 		return thumbnails;
@@ -114,17 +122,17 @@ public class Youtuber {
 	public void setActivity(int activity) {
 		this.activity = activity;
 	}
-	public int getGrowth() {
-		return growth;
+	public int getViewCountTrend() {
+		return viewCountTrend;
 	}
-	public void setGrowth(int growth) {
-		this.growth = growth;
+	public void setViewCountTrend(int viewCountTrend) {
+		this.viewCountTrend = viewCountTrend;
 	}
-	public int getBasicStat() {
-		return basicStat;
+	public int getSubscriberCountTrend() {
+		return subscriberCountTrend;
 	}
-	public void setBasicStat(int basicStat) {
-		this.basicStat = basicStat;
+	public void setSubscriberCountTrend(int subscriberCountTrend) {
+		this.subscriberCountTrend = subscriberCountTrend;
 	}
 	public int getCharm() {
 		return charm;
@@ -138,16 +146,58 @@ public class Youtuber {
 	public void setClickCount(int clickCount) {
 		this.clickCount = clickCount;
 	}
-	public Date getUpdateDate() {
-		return updateDate;
+	public Date getUpdatedDate() {
+		return updatedDate;
 	}
-	public void setUpdateDate(Date updateDate) {
-		this.updateDate = updateDate;
+	public void setUpdatedDate(Date updatedDate) {
+		this.updatedDate = updatedDate;
 	}
 	public Date getRegDate() {
 		return regDate;
 	}
 	public void setRegDate(Date regDate) {
 		this.regDate = regDate;
+	}
+	public String getOtherLink1() {
+		return otherLink1;
+	}
+	public void setOtherLink1(String otherLink1) {
+		this.otherLink1 = otherLink1;
+	}
+	public String getOtherLink2() {
+		return otherLink2;
+	}
+	public void setOtherLink2(String otherLink2) {
+		this.otherLink2 = otherLink2;
+	}
+	public String getOtherLink3() {
+		return otherLink3;
+	}
+	public void setOtherLink3(String otherLink3) {
+		this.otherLink3 = otherLink3;
+	}
+	public String getOtherLink4() {
+		return otherLink4;
+	}
+	public void setOtherLink4(String otherLink4) {
+		this.otherLink4 = otherLink4;
+	}
+	public String getOtherLink5() {
+		return otherLink5;
+	}
+	public void setOtherLink5(String otherLink5) {
+		this.otherLink5 = otherLink5;
+	}
+	public String getUploadsID() {
+		return uploadsID;
+	}
+	public void setUploadsID(String uploadsID) {
+		this.uploadsID = uploadsID;
+	}
+	public String getSearchKeyword() {
+		return searchKeyword;
+	}
+	public void setSearchKeyword(String searchKeyword) {
+		this.searchKeyword = searchKeyword;
 	}
 }

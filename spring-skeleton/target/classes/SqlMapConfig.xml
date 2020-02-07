@@ -5,9 +5,19 @@
 	<typeAliases>
 		<typeAlias type="com.ssafy.model.dto.Youtuber"	alias="youtuber"/>
 		<typeAlias type="com.ssafy.model.dto.Category"	alias="category"/>
+		<typeAlias type="com.ssafy.model.dto.Community"	alias="community"/>
+		<typeAlias type="com.ssafy.model.dto.News"		alias="news"/>
+		<typeAlias type="com.ssafy.model.dto.Video"		alias="video"/>
+		<typeAlias type="com.ssafy.model.dto.Trend"		alias="trend"/>
+		<typeAlias type="com.ssafy.model.dto.Favorite"	alias="favorite"/>
+		<typeAlias type="com.ssafy.model.dto.User"		alias="user"/>
 	</typeAliases>
 	<mappers>
 		<mapper resource="mapper/Youtuber_query.xml"/>
 		<mapper resource="mapper/Category_query.xml"/>
+		<mapper resource="mapper/News_query.xml"/>
+		<mapper resource="mapper/Video_query.xml"/>
+		<mapper resource="mapper/Favorite_query.xml"/>
+		<mapper resource="mapper/User_query.xml"/>
 	</mappers>
 </configuration>

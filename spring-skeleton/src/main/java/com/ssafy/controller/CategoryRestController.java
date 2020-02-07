@@ -30,7 +30,7 @@ public class CategoryRestController {
 		return handleFail(e.getMessage(), HttpStatus.OK);
 	}
 	
-	@ApiOperation("category에 속한 유투버 검색")
+	@ApiOperation("category에 속한 유투버 검색 ")
 	@GetMapping("/category/{cano}")
 	public ResponseEntity<Map<String, Object>> search(@PathVariable int cano){
 		List<Youtuber> list = categoryService.search(cano); 
@@ -38,8 +38,8 @@ public class CategoryRestController {
 	}
 	
 	@ApiOperation("전체 category 검색")
-	@GetMapping("/category/all")
-	public ResponseEntity<Map<String, Object>> searchAll(){
+	@GetMapping("/category/searchAll")
+	public ResponseEntity<Map<String, Object>> searchKeyword(){
 		List<Category> list = categoryService.searchAll(); 
 		return handleSuccess(list);
 	}
@@ -56,5 +56,5 @@ public class CategoryRestController {
 		resultMap.put("state", "ok");
 		resultMap.put("data", data);
 		return new ResponseEntity<Map<String,Object>>(resultMap, HttpStatus.OK);
-	}
+	}	
 }

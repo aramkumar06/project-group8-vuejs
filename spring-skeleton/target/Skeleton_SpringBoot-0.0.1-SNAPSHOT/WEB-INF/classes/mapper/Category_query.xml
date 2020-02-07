@@ -3,12 +3,13 @@
 
 <mapper namespace="com.ssafy.model.dao.CategoryDao">
 
-	<!-- category에 속한 유투버 검색 -->
+	<!-- category에 속한 유투버 검색 / 구독자 순 정렬 -->
 	<select id="search" parameterType="int" resultType="youtuber">
 		select *
-		from youtuber y inner join category_youtube_relation c 
+		from youtuber y inner join category_youtube_relation care
 		using (yno)
-		where c.cano = #{cano};
+		where care.cano = #{cano}
+		order by y.subscriber desc
 	</select>
 
 	<!-- 전체 category 검색 -->
@@ -16,4 +17,5 @@
 		select *
 		from category
 	</select>
+	
 </mapper>

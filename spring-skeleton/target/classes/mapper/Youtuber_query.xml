@@ -5,33 +5,149 @@
 
 	<!-- 여러개가 나오더라도 resultType에는 리스트 형으로 쓰지 않는다 -->
 
-	<!-- youtuber 고유번호 검색-->
+	<!-- youtuber 고유번호로 유투버 정보 검색 -->
 	<select id="search" parameterType="int" resultType="youtuber">
 		select *
 		from youtuber
-		where yno=#{yno};
+		where yno=#{yno}
+	</select>
+	
+	<!-- youtuber 고유번호로 카테고리 번호, 카테고리명 검색 / 카테고리번호로 오름차순 -->
+	<select id="searchCategoryList" parameterType="int" resultType="category">
+		select distinct cy.cano cano, c.name name
+		from category_youtube_relation cy inner join category c
+		using (cano)
+		where cy.yno = #{yno}
+		order by cano asc
 	</select>
 
-	<!-- youtuber 정보 검색 -->
+	<!-- 키워드로 youtuber 정보 검색 / 구독자 순으로 -->
 	<select id="searchKeyword" parameterType="String" resultType="youtuber">
 		select *
 		from youtuber
 		where channelName like concat('%', #{keyword}, '%')
 		 or youtuberName like concat('%', #{keyword}, '%')
 		 or channelDescription like concat('%', #{keyword}, '%')
-		order by subscriber desc;
+		order by subscriber desc
 	</select>
 	
-	<!-- 전체 youtuber 조회 -->
+	<!-- 전체 youtuber 조회 / 구독자 순으로 -->
 	<select id="searchAll" resultType="youtuber">
-		select * from youtuber
-	</select>	
-	
-	<!-- 검색 조건에 따른 youtuber 랭킹 조회. searchCondition이 검색조건, num이 가져올 개수 -->
-	<select id="searchRanking" parameterType="java.util.Map" resultType="youtuber">
 		select *
 		from youtuber
-		order by #{searchCondition}
-		limit ${num}
+		order by subscriber desc
+	</select>
+	
+	<!-- 정렬 조건에 따른 youtuber 랭킹 조회. searchCondition이 정렬 조건, num이 가져올 개수 -->
+	<select id="searchRanking" parameterType="java.util.Map" resultType="youtuber">
+		<if test="searchCondition != null">
+			select *
+			from youtuber
+			<choose>
+				<when test="searchCondition == 'subscriber'">
+					order by subscriber desc limit ${num}
+				</when>
+				<when test="searchCondition == 'totalViewCount'">
+					order by totalViewCount desc limit ${num}
+				</when>
+				<when test="searchCondition == 'totalVideoCount'">
+					order by totalVideoCount desc limit ${num}
+				</when>
+				<when test="searchCondition == 'grade'">
+					order by grade desc limit ${num}
+				</when>
+				<when test="searchCondition == 'clickCount'">
+					order by clickCount desc limit ${num}
+				</when>
+				<when test="searchCondition == 'updatedDate'">
+					order by updatedDate desc limit ${num}
+				</when>
+				<otherwise>
+					limit 0
+				</otherwise>
+			</choose>
+		</if>
+	</select>
+	
+	<!-- 유투버 상세페이지에 보여줄 뉴스 검색 / 최신 뉴스 순으로 -->
+	<select id="searchNews" parameterType="int" resultType="news">
+		<!-- select n.nno, n.yno, n.newsLink, n.newsTitle, n.newsDescription, n.newsDate, n.pressName, n.clickCount -->
+		select *
+		from youtuber y inner join news n
+		using (yno)
+		where y.yno = #{yno}
+		order by newsDate desc
+	</select>
+	
+	<!-- 유투버 상세페이지에 보여줄 영상 검색 / 영상 조회수가 높은 순으로 -->
+	<select id="searchVideo" parameterType="int" resultType="video">
+		<!-- select v.vno, v.yno, v.videoName, v.videoDescription, v.videoViewCount, v.videoCommentCount, 
+		v.good, v.bad, v.regDate, v.ycano, v.tags, v.thumbnail, v.topic -->
+		select *
+		from youtuber y inner join video v
+		using (yno)
+		where y.yno = #{yno}
+		order by videoViewCount desc
+	</select>
+	
+	<!-- 유투버 상세페이지에 보여줄 커뮤니티 검색 / 언급수 높은 순으로 -->
+	<!-- <select id="searchCommunity" parameterType="int" resultType="community">
+		select *
+		from community_youtuber_relation core inner join community c
+		using (cono)
+		where core.yno = #{yno}
+		order by mentionCount desc
+	</select> -->
+	
+	<!-- 유투버 상세페이지에 보여줄 성장성 데이터 / 과거 날짜 순으로 -->
+	<select id="searchTrend" parameterType="int" resultType="trend">
+		select *
+		from "trend"
+		where yno = #{yno}
+		order by recordDate asc
+	</select>
+	
+	<!-- 호감도 / 유투버 상세페이지에 보여줄 가장 최근 동영상 정보 + 좋아요 싫어요 비율 정보(goodRatio) / 최근 영상 num개에 대해서 -->
+	<select id="searchVideoGoodRatio" parameterType="java.util.Map" resultType="video">
+		select *, (good / (good + bad)) goodRatio
+		from video
+		where yno = #{yno} 
+		order by regDate desc
+		limit #{num}
+	</select>
+	
+	<!-- 호감도 / 유투버 상세페이지에 보여줄 최근 num개 동영상에 대한 좋아요 싫어요 비율 정보(goodRatio) -> 총합산비율 하나만 나옴 -->
+	<select id="searchGoodRatio" parameterType="java.util.Map" resultType="double">
+		select (sum(good) / (sum(good) + sum(bad))) as goodRatio
+		from video
+		where yno = #{yno} 
+		order by regDate desc
+		limit #{num}
+	</select>
+	
+	<!-- 활동 지수 / 유투버 상세페이지에 보여줄 최근 N달 간 업로드 한 영상 개수  -->
+	<select id="searchVideoCount" parameterType="java.util.Map" resultType="int">
+		select count(vno) videoCount
+		from video
+		WHERE yno = #{yno} and date(regDate) >= SUBDATE(NOW(), INTERVAL #{term} MONTH)
+	</select>
+	
+	<!-- 활동 지수 / 유투버 상세페이지에 보여줄 num주(or 달) 간 영상 개수 / 최근 num 주에 대하여  과거순으로 -->
+	<select id="searchTermVideoCount" parameterType="java.util.Map" resultType="int">
+		select count(*) videoCount
+		from video 
+		where yno=#{yno}
+			and regDate 
+				between date_sub(DATE_ADD(now(), INTERVAL (DAYOFWEEK(now())-1) * -1 DAY), INTERVAL #{num} week) 
+		        and DATE_ADD(now(), INTERVAL (DAYOFWEEK(now())-1) * -1 DAY)
+		group by date_format(regDate, '%y-%u')
+		order by date_format(regDate, '%y-%u') asc
+		
+		<!-- 이전 코드 (사용X) -->
+		<!-- select count(*) videoCount
+		from video
+		where yno=${yno}
+			and regDate between date_add(NOW(), INTERVAL ${end} WEEK)
+								and date_add(NOW(), INTERVAL ${start} WEEK) -->
 	</select>
 </mapper>

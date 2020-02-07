@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.model.dao.NewsDao">
+
+	<!-- 여러개가 나오더라도 resultType에는 리스트 형으로 쓰지 않는다 -->
+
+	<!-- news 고유번호로 뉴스 정보 검색 -->
+	<select id="search" parameterType="int" resultType="news">
+		select *
+		from news
+		where nno=#{nno}
+	</select>
+
+	<!-- 키워드로 news 정보 검색 / 최신 뉴스 순으로 -->
+	<select id="searchKeyword" parameterType="String" resultType="news">
+		select *
+		from news
+		where newsTitle like concat('%', #{keyword}, '%')
+			or newsDescription like concat('%', #{keyword}, '%')
+			or pressName like concat('%', #{keyword}, '%')
+		order by newsDate desc;
+	</select>
+	
+	<!-- 전체 news 조회	 / 최신 뉴스 순으로 -->
+	<select id="searchAll" resultType="news">
+		select *
+		from news
+		order by newsDate desc
+	</select>
+	
+	<!-- 정렬 조건에 따른 news 랭킹 조회. num이 가져올 개수 -->
+	<select id="searchRanking" parameterType="java.util.Map" resultType="news">
+		select *
+		from news
+		<if test="searchCondition != null">
+			<choose>
+				<when test="searchCondition == 'clickCount'">
+					order by clickCount desc limit ${num}
+				</when>
+				<when test="searchCondition == 'newsDate'">
+					order by newsDate desc limit ${num}
+				</when>
+				<otherwise>
+					limit 0
+				</otherwise>
+			</choose>
+		</if>
+	</select>
+	
+</mapper>

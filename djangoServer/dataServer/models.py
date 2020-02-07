@@ -7,7 +7,7 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
-
+ 
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=150)
 
@@ -215,6 +215,17 @@ class User(models.Model):
     class Meta:
         managed = False
         db_table = 'user'
+
+
+class Stat(models.Model):
+    sno = models.AutoField(primary_key=True)
+    yno = models.IntegerField(db_column='userID', max_length=100)  # Field name made lowercase.
+    kinds = models.IntegerField(db_column='userEmail', max_length=100, blank=True, null=True)  # Field name made lowercase.
+    values = models.FloatField(db_column='userName', max_length=100)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'stat'
 
 
 class Video(models.Model):

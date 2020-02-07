@@ -174,12 +174,12 @@ def make_new_youtuber(request, url):
     for our_cano in our_cano_list:
         category = Category.objects.get(cano=our_cano)
         print(category.name)
-        # cy_relation = CategoryYoutubeRelation.objects.create(
-        #     yno=youtuber,
-        #     cano=category
-        # )
-        # print('!@#!@#!@#!@#!@#!@#!@#@!')
-        # cy_relation.save()
+        cy_relation = CategoryYoutubeRelation.objects.create(
+            yno=youtuber.yno,
+            cano=category.cano
+        )
+        print('!@#!@#!@#!@#!@#!@#!@#@!')
+        cy_relation.save()
     # Todo 8.  community, news 테이블 수집 후 DB 추가
 
     # Todo 9. 위에서 생성된 정보들 기반으로 스텟, 등급 계산

@@ -147,6 +147,7 @@ def make_new_youtuber(request, url):
         youtuber.save()
     except Exception as e:
         print(e)
+        youtuber.delete()
         res['code'] = -4
         return HttpResponse(json.dumps(res))
     timer.append(timeit.default_timer())
@@ -158,6 +159,7 @@ def make_new_youtuber(request, url):
         yno = get_yno_from_channel_id(channel_id)
     except Exception as e:
         print(e)
+        youtuber.delete()
         res['code'] = -5
         return HttpResponse(json.dumps(res))
     timer.append(timeit.default_timer())
@@ -194,6 +196,7 @@ def make_new_youtuber(request, url):
             start_timer = end_timer
     except Exception as e:
         print(e)
+        youtuber.delete()
         res['code'] = -6
         return HttpResponse(json.dumps(res))
     timer.append(timeit.default_timer())
@@ -233,6 +236,7 @@ def make_new_youtuber(request, url):
         today_trend.save()
     except Exception as e:
         print(e)
+        youtuber.delete()
         res['code'] = -7
         return HttpResponse(json.dumps(res))
     timer.append(timeit.default_timer())
@@ -243,8 +247,7 @@ def make_new_youtuber(request, url):
 
     # 8 calculate valid ycano list
     valid_ycano_list = []
-    tmp_ycano_list = Video.objects.filter(yno=yno).values(
-        'ycano').annotate(total=Count('ycano')).order_by('total').reverse()
+    tmp_ycano_list = Video.objects.filter(yno=yno).values('ycano').annotate(total=Count('ycano')).order_by('total').reverse()
     for ycategory in tmp_ycano_list:
         if ycategory['total'] >= len(video_detail_list) * 0.11:
             valid_ycano_list.append(ycategory['ycano'])
@@ -254,7 +257,7 @@ def make_new_youtuber(request, url):
     youtuber.status = 77
     youtuber.save()
 
-    # 9 get our category
+    # 9 get our category (에러날일이 없다)
     our_cano_list = get_our_cano(valid_ycano_list, video_detail_list)
     timer.append(timeit.default_timer())
     print('%2d. [%5.2f / %5.2f s] get our category'
@@ -263,12 +266,18 @@ def make_new_youtuber(request, url):
     youtuber.save()
 
     # 10 add CategoryYoutubeRelation
-    for our_cano in our_cano_list:
-        category = Category.objects.get(cano=our_cano)
-        CategoryYoutubeRelation.objects.create(
-            yno=youtuber,
-            cano=category
-        )
+    try:
+        for our_cano in our_cano_list:
+            category = Category.objects.get(cano=our_cano)
+            CategoryYoutubeRelation.objects.create(
+                yno=youtuber,
+                cano=category
+            )
+    except Exception as e:
+        print(e)
+        youtuber.delete()
+        res['code'] = -8
+        return HttpResponse(json.dumps(res))
     timer.append(timeit.default_timer())
     print('%2d. [%5.2f / %5.2f s] add CategoryYoutubeRelation'
           % (len(timer) - 1, timer[len(timer) - 1] - timer[len(timer) - 2], timer[len(timer) - 1] - timer[0]))
@@ -276,18 +285,23 @@ def make_new_youtuber(request, url):
     youtuber.save()
 
     # 11 news 테이블 수집
-    news_list = get_news_list(youtuber, our_cano_list,
-                              datetime.datetime(2010, 1, 1))
-    for news in news_list:
-        News.objects.create(
-            yno=youtuber,
-            newslink=news['newsLink'],
-            newstitle=news['newsTitle'],
-            newsdescription=news['newsDescription'],
-            newsdate=news['newsDate'],
-            pressname='',
-            clickcount=0,
-        )
+    try:
+        news_list = get_news_list(youtuber, our_cano_list, datetime.datetime(2010, 1, 1))
+        for news in news_list:
+            News.objects.create(
+                yno=youtuber,
+                newslink=news['newsLink'],
+                newstitle=news['newsTitle'],
+                newsdescription=news['newsDescription'],
+                newsdate=news['newsDate'],
+                pressname='',
+                clickcount=0,
+            )
+    except Exception as e:
+        print(e)
+        youtuber.delete()
+        res['code'] = -9
+        return HttpResponse(json.dumps(res))
     timer.append(timeit.default_timer())
     print('%2d. [%5.2f / %5.2f s] news 테이블 수집'
           % (len(timer) - 1, timer[len(timer) - 1] - timer[len(timer) - 2], timer[len(timer) - 1] - timer[0]))
@@ -296,10 +310,10 @@ def make_new_youtuber(request, url):
 
     # 12.  community 테이블 수집 후 DB 추가
     try:
-        get_daumCafe_search_result(
-            youtuber, our_cano_list,  datetime.datetime(2010, 1, 1))
+        get_daumCafe_search_result(youtuber, our_cano_list,  datetime.datetime(2010, 1, 1))
     except Exception as e:
         print('*ERROR (10) : ', e)
+        youtuber.delete()
         res['code'] = -10
         return HttpResponse(json.dumps(res))
     timer.append(timeit.default_timer())
@@ -309,7 +323,13 @@ def make_new_youtuber(request, url):
     youtuber.save()
 
     # 13. naverDataLab 추가
-    insert_naver_data_lab(youtuber)
+    try:
+        insert_naver_data_lab(youtuber)
+    except Exception as e:
+        print('*ERROR naverDataLab : ', e)
+        youtuber.delete()
+        res['code'] = -10
+        return HttpResponse(json.dumps(res))
     timer.append(timeit.default_timer())
     print('%2d. [%5.2f / %5.2f s] naverDataLab 추가'
           % (len(timer) - 1, timer[len(timer) - 1] - timer[len(timer) - 2], timer[len(timer) - 1] - timer[0]))
@@ -317,14 +337,20 @@ def make_new_youtuber(request, url):
     youtuber.save()
 
     # 14. 위에서 생성된 정보들 기반으로 스텟, 등급 계산
-    now = datetime.datetime.now(
-        datetime.timezone.utc) + datetime.timedelta(hours=9)
-    trends = Trend.objects.filter(yno=youtuber).order_by('-recorddate')
     last_month_trend = None
-    for trend in trends:
-        last_month_trend = trend
-        if (now - trend.recorddate).days >= 30:
-            break
+    try:
+        now = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=9)
+        trends = Trend.objects.filter(yno=youtuber).order_by('-recorddate')
+        for trend in trends:
+            last_month_trend = trend
+            if (now - trend.recorddate).days >= 30:
+                break
+    except Exception as e:
+        print(e)
+        youtuber.delete()
+        res['code'] = -11
+        return HttpResponse(json.dumps(res))
+
     youtuber.status = 97
     youtuber.save()
 
@@ -332,37 +358,47 @@ def make_new_youtuber(request, url):
     print('%2d. [%5.2f / %5.2f s] 위에서 생성된 정보들 기반으로 스텟, 등급 계산'
           % (len(timer) - 1, timer[len(timer) - 1] - timer[len(timer) - 2], timer[len(timer) - 1] - timer[0]))
 
-    stat_influence = get_influence(youtuber)
-    stat_activity = get_activity(youtuber, video_detail_list)
-    stat_trend = get_trend(youtuber, last_month_trend, today_trend)
-    stat_views = get_views(youtuber, last_month_trend, today_trend)
-    stat_charm = get_charm(video_detail_list)
-    grade = get_grade(youtuber, stat_influence, stat_activity,
-                      stat_trend, stat_views, stat_charm)
+    try:
+        stat_influence = get_influence(youtuber)
+        stat_activity = get_activity(youtuber, video_detail_list)
+        stat_trend = get_trend(youtuber, last_month_trend, today_trend)
+        stat_views = get_views(youtuber, last_month_trend, today_trend)
+        stat_charm = get_charm(video_detail_list)
+        grade = get_grade(youtuber, stat_influence, stat_activity, stat_trend, stat_views, stat_charm)
+    except Exception as e:
+        print('* Exception :', e)
+        youtuber.delete()
+        res['code'] = -12
+        return HttpResponse(json.dumps(res))
     print('*-----------------------------------------------------------*')
     print('| Influence |  Activity |     Trend |     Views |     Charm |')
     print('*-----------------------------------------------------------*')
     print('| %9d | %9d | %9d | %9d | %9d |' % (stat_influence, stat_activity, stat_trend, stat_views, stat_charm))
     print('*--------------------- Grade : %3d -------------------------*\n' % grade)
-
     youtuber.status = 100
     youtuber.save()
+
     # 15. 유튜버의 스텟, 등급, updatedDate 갱신
-    now = datetime.datetime.now()
-    youtuber.influence = stat_influence
-    youtuber.activity = stat_activity
-    youtuber.viewcounttrend = stat_views
-    youtuber.subscribercounttrend = stat_trend
-    youtuber.charm = stat_charm
-    youtuber.grade = grade 
-    youtuber.updateddat = now
-     
-    print('*------------------ Total : %.2f s----------------------*' % (timeit.default_timer() - timer[0]))
-    res['code'] = 0
-    res['yno'] = yno
-    time.sleep(1.5)
-    youtuber.status = 0
-    youtuber.save()
+    try:
+        now = datetime.datetime.now()
+        youtuber.influence = stat_influence
+        youtuber.activity = stat_activity
+        youtuber.viewcounttrend = stat_views
+        youtuber.subscribercounttrend = stat_trend
+        youtuber.charm = stat_charm
+        youtuber.grade = grade 
+        youtuber.updateddat = now
+        print('*---------------------- Total : %.2f s----------------------*' % (timeit.default_timer() - timer[0]))
+        res['code'] = 0
+        res['yno'] = yno
+        time.sleep(1.5)
+        youtuber.status = 0
+        youtuber.save()
+    except Exception as e:
+        print('* Exception :', e)
+        youtuber.delete()
+        res['code'] = -12
+        return HttpResponse(json.dumps(res))
     return HttpResponse(json.dumps(res))
 
 #-------------------------------------------------------------------------------------------------------------------------#

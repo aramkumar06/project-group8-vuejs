@@ -131,8 +131,9 @@ def get_trend_list(channel_id):
     options.add_argument('--no-sandbox')
     options.add_argument('--headless')
     options.add_argument('--disable-dev-shm-usage')
-    options.add_argument(
-        "user-agent=Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko")
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko")
+    # options.add_argument("user-agent=Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36")
+    # driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', options=options) # this is for Ubuntu but access is denied.
     driver = webdriver.Chrome('./chromedriver', options=options)
     url = 'https://socialblade.com/youtube/channel/' + channel_id + '/monthly'
     driver.get(url)

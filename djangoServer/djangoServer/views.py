@@ -48,9 +48,10 @@ NECESSARY_WORD = [
 
 MONTH = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-UPDATE_CIRCLE = 3600
+UPDATE_CIRCLE = 3
 
 LAST_ALL_UPDATE = Youtuber.objects.all()[0].updateddate
+# LAST_ALL_UPDATE = datetime.datetime(2020, 2, 10)
 
 class updateThread:
     def __init__(self):
@@ -64,8 +65,8 @@ class updateThread:
         global NECESSARY_WORD, MONTH
         global LAST_ALL_UPDATE, UPDATE_CIRCLE
         
-        TIME_CHECK = datetime.datetime.now()
-        
+        TIME_CHECK = datetime.datetime.now(datetime.timezone.utc)
+
         if (TIME_CHECK - LAST_ALL_UPDATE).days >= 1:
             # 하루가 지나면 업데이트 시행
             print("-------------------------- UPDATE IS STARTED!")
@@ -484,6 +485,7 @@ class updateThread:
             ########## 모두 끝나고, 업데이트 주기 다시 실행!
             threading.Timer(UPDATE_CIRCLE, self.threadOpen).start()
         else:
+            print('update not yet')
             threading.Timer(UPDATE_CIRCLE, self.threadOpen).start()
 
 

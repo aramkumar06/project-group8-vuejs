@@ -15,6 +15,7 @@ import timeit
 import datetime
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
+from IPython import embed
 
 
 GOOGLE_KEY_LIST = [config('GOOGLEAPIKEY5'), config('GOOGLEAPIKEY7'), config('GOOGLEAPIKEY6'), config('GOOGLEAPIKEY8'), config('GOOGLEAPIKEY1'), config('GOOGLEAPIKEY2'), config('GOOGLEAPIKEY3'), config('GOOGLEAPIKEY4'), config('GOOGLEAPIKEY9')]
@@ -133,12 +134,13 @@ def get_trend_list(channel_id):
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko")
-    driver = webdriver.Chrome('./chromedriver', options=options)
+    driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', options=options)
     url = 'https://socialblade.com/youtube/channel/' + channel_id + '/monthly'
     driver.get(url)
     el = '//*[@id="socialblade-user-content"]'
     orm = []
     try:
+        embed()
         content = driver.find_element_by_xpath(el).text.split('\n')
         cnt = 0
         flag = False
@@ -185,7 +187,8 @@ def get_trend_list(channel_id):
                     elif cnt == 5:
                         data['pointView'] = int(total_stars)
                     cnt += 1
-    except NoSuchElementException:
+    except NoSuchElementException as e:
+        print(e)
         pass
     driver.close()
     return orm

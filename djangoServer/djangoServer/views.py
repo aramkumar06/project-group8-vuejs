@@ -47,7 +47,7 @@ NECESSARY_WORD = [
 
 MONTH = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-UPDATE_CIRCLE = 3
+UPDATE_CIRCLE = 3600
 
 LAST_ALL_UPDATE = Youtuber.objects.all()[0].updateddate
 

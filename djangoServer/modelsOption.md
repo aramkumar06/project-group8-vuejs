@@ -24,4 +24,4 @@ $ python manage.py inspectdb > dataServer/models.py
 \# 옵션사항
 
 - `on_delete=models.CASCADE`  추가 여부 (현재는 DB 자체 옵션으로 실행 중)
-
+- CategoryYoutuber 옵션 삭제

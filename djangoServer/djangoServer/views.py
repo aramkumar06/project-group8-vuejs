@@ -4,7 +4,7 @@ from django.shortcuts import render, HttpResponse
 import threading
 import datetime
 from dataServer.models import Youtuber, Trend, Video, Community, CategoryYoutubeRelation, Category, News, Naverdatalab, Stat
-from dataServer.function import get_channel_other_sites
+from dataServer.function import get_channel_other_sites, date_is_valid
 from dataServer.views import update_stat_without_request
 import time
 from decouple import config
@@ -15,7 +15,6 @@ from pytz import timezone, tzinfo
 from django.utils import timezone
 from IPython import embed
 import requests
-from dataServer.function import date_is_valid
 from dataServer.stat import get_influence, get_activity3, get_views, get_trend, get_charm, get_grade
 
 
@@ -51,6 +50,8 @@ MONTH = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct
 UPDATE_CIRCLE = 3600
 
 LAST_ALL_UPDATE = Youtuber.objects.all()[0].updateddate
+# LAST_ALL_UPDATE = datetime.datetime(2020, 2, 10)
+
 
 class updateThread:
     def __init__(self):
@@ -59,12 +60,12 @@ class updateThread:
     def threadOpen(self):
         global GOOGLE_KEY_INDEX, GOOGLE_KEY_LIST
         global DAUM_API_KEYS, DAUM_API_INDEX
-        global NAVER_ID_LIST, NAVER_SECRET_LIST, NAVER_ID_INDEX, NAVER_SECRET_INDEX
-        global NAVER_DATA_ID, NAVER_DATA_SECRET, NAVER_DATA_ID_INDEX, NAVER_DATA_SECRET_INDEX
+        global NAVER_ID_LIST, NAVER_SECRET_LIST, NAVER_ID_INDEX
+        global NAVER_DATA_ID, NAVER_DATA_SECRET, NAVER_DATA_ID_INDEX
         global NECESSARY_WORD, MONTH
         global LAST_ALL_UPDATE, UPDATE_CIRCLE
         
-        TIME_CHECK = datetime.datetime.now()
+        TIME_CHECK = datetime.datetime.now(datetime.timezone.utc)
         
         if (TIME_CHECK - LAST_ALL_UPDATE).days >= 1:
             # 하루가 지나면 업데이트 시행
@@ -484,6 +485,7 @@ class updateThread:
             ########## 모두 끝나고, 업데이트 주기 다시 실행!
             threading.Timer(UPDATE_CIRCLE, self.threadOpen).start()
         else:
+            print('update not yet')
             threading.Timer(UPDATE_CIRCLE, self.threadOpen).start()
 
 

@@ -17,11 +17,20 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
 
-key_list = [config('GOOGLEAPIKEY5'), config('GOOGLEAPIKEY7'), config('GOOGLEAPIKEY6'), config('GOOGLEAPIKEY8'),
-            config('GOOGLEAPIKEY1'), config('GOOGLEAPIKEY2'), config(
-                'GOOGLEAPIKEY3'), config('GOOGLEAPIKEY4'),
-            config('GOOGLEAPIKEY9')]
-key_index = 0
+GOOGLE_KEY_LIST = [config('GOOGLEAPIKEY5'), config('GOOGLEAPIKEY7'), config('GOOGLEAPIKEY6'), config('GOOGLEAPIKEY8'), config('GOOGLEAPIKEY1'), config('GOOGLEAPIKEY2'), config('GOOGLEAPIKEY3'), config('GOOGLEAPIKEY4'), config('GOOGLEAPIKEY9')]
+GOOGLE_KEY_INDEX = 0
+
+DAUM_API_KEYS = [config('DAUM_API_KEY1'), config('DAUM_API_KEY2')]
+DAUM_API_INDEX = 0
+
+NAVER_ID_LIST = [config('X_NAVER_CLIENT_ID1'), config('X_NAVER_CLIENT_ID2')]
+NAVER_SECRET_LIST = [config('X_NAVER_CLIENT_SECRET1'), config('X_NAVER_CLIENT_SECRET2')]
+NAVER_ID_INDEX = 0
+
+NAVER_DATA_ID = [config('NAVER_DATALAB_CLIENT_ID1'), config('NAVER_DATALAB_CLIENT_ID2')]
+NAVER_DATA_SECRET = [config('NAVER_DATALAB_CLIENT_SECRET1'), config('NAVER_DATALAB_CLIENT_SECRET2')]
+NAVER_DATA_ID_INDEX = 0
+
 
 # 기본, 게임, 엔터테인먼트, 뷰티, 스포츠, 먹망, 키즈, 동물, 일상, IT
 NECESSARY_WORD = [
@@ -78,9 +87,9 @@ def get_channel_other_sites(input_url):
 
 
 def get_channel_info(channelID):
-    global key_index
-    global key_list
-    key = key_list[key_index]
+    global GOOGLE_KEY_INDEX
+    global GOOGLE_KEY_LIST
+    key = GOOGLE_KEY_LIST[GOOGLE_KEY_INDEX]
     channel_info_dict = {}
     base_url = "https://www.googleapis.com/youtube/v3/channels"
     part = "id,snippet,brandingSettings,contentDetails,invideoPromotion,statistics,topicDetails"
@@ -89,9 +98,9 @@ def get_channel_info(channelID):
             base_url + "?part=%s&id=%s&key=%s" % (part, channelID, key))
     except urllib.request.HTTPError:
         print('*--- %d -> %d : next key setting & restart ---*' %
-              (key_index, (key_index+1) % len(key_list)))
-        key_index += 1
-        key_index %= len(key_list)
+              (GOOGLE_KEY_INDEX, (GOOGLE_KEY_INDEX+1) % len(GOOGLE_KEY_LIST)))
+        GOOGLE_KEY_INDEX += 1
+        GOOGLE_KEY_INDEX %= len(GOOGLE_KEY_LIST)
         return get_channel_info(channelID)
     info_obj = json.loads(response.read().decode('utf-8'))["items"][0]
 
@@ -183,9 +192,9 @@ def get_trend_list(channel_id):
 
 
 def get_video_list(uploads_id):
-    global key_list
-    global key_index
-    key = key_list[key_index]
+    global GOOGLE_KEY_LIST
+    global GOOGLE_KEY_INDEX
+    key = GOOGLE_KEY_LIST[GOOGLE_KEY_INDEX]
     video_id_lists = []
     page_token = ''
     base_url = "https://www.googleapis.com/youtube/v3/playlistItems"
@@ -200,8 +209,8 @@ def get_video_list(uploads_id):
             response = urllib.request.urlopen(url)
         except urllib.request.HTTPError:
             print('*--- next key setting & restart ---*')
-            key_index += 1
-            key_index %= len(key_list)
+            GOOGLE_KEY_INDEX += 1
+            GOOGLE_KEY_INDEX %= len(GOOGLE_KEY_LIST)
             return get_video_list(uploads_id)
         json_objs = json.loads(response.read().decode('utf-8'))
         for obj in json_objs['items']:
@@ -280,9 +289,9 @@ TOPICS = {
 
 
 def get_video_detail(video_id):
-    global key_list
-    global key_index
-    key = key_list[key_index]
+    global GOOGLE_KEY_LIST
+    global GOOGLE_KEY_INDEX
+    key = GOOGLE_KEY_LIST[GOOGLE_KEY_INDEX]
     # snippet으로 가져오는 정보: 유튜버, 제목, 설명, 게시일, 카테고리, 태그, 섬네일
     # statistics로 가져오는 정보: 조회수, 댓글 수, 좋아요 수, 싫어요 수
     # topicdetails로 가져오는 정보: 토픽
@@ -293,8 +302,8 @@ def get_video_detail(video_id):
         response = urlopen(url).read().decode('utf-8')
     except:
         print('*--- next key setting & restart ---*')
-        key_index += 1
-        key_index %= len(key_list)
+        GOOGLE_KEY_INDEX += 1
+        GOOGLE_KEY_INDEX %= len(GOOGLE_KEY_LIST)
         return get_video_detail(video_id)
     res_dict = json.loads(response).get('items')[0]
 
@@ -330,8 +339,7 @@ def get_video_detail(video_id):
 
 def get_news_list(youtuber, category, last_updated_date):
 
-    MONTH = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May',
-             'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    MONTH = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     YOUTUBER = youtuber.channelname  # DB 에서 yno 에 해당하는 channelName or youtubeName 을 입력
     CATEGORY = category
 
@@ -344,8 +352,8 @@ def get_news_list(youtuber, category, last_updated_date):
     }
 
     headers = {
-        'X-Naver-Client-Id': config('X_NAVER_CLIENT_ID'),
-        'X-Naver-Client-Secret': config('X_NAVER_CLIENT_SECRET'),
+        'X-Naver-Client-Id': config('X_NAVER_CLIENT_ID2'),
+        'X-Naver-Client-Secret': config('X_NAVER_CLIENT_SECRET2'),
     }
 
     category_keyword = NECESSARY_WORD[0]
@@ -454,7 +462,7 @@ def date_is_valid(dateStr, lastupdate):  # ex) '2019-03-16'
 
 def get_daumCafe_search_result(YOUTUBER, category, lastupdate):
     # API_KEY를 더 넣도록 합시다.
-    API_KEYS = [config('DAUM_API_KEY')]
+    API_KEYS = [config('DAUM_API_KEY2')]
 
     # YOUTUBER를 활용해, searchKeyword, lastUpdate, category 등등을 가져온다.
     searchKeyword = YOUTUBER.channelname
@@ -526,8 +534,8 @@ def get_daumCafe_search_result(YOUTUBER, category, lastupdate):
 
 def insert_naver_data_lab(youtuber):
     result = ''
-    client_id = config("NAVER_DATALAB_CLIENT_ID")
-    client_secret = config("NAVER_DATALAB_CLIENT_SECRET")
+    client_id = config("NAVER_DATALAB_CLIENT_ID2")
+    client_secret = config("NAVER_DATALAB_CLIENT_SECRET2")
     url = "https://openapi.naver.com/v1/datalab/search"
     startDate = (datetime.datetime.now() + datetime.timedelta(days=-365)).strftime("%Y-%m-%d")
     endDate = datetime.datetime.utcnow().strftime("%Y-%m-%d")

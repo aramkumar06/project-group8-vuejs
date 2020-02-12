@@ -50,7 +50,6 @@ MONTH = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct
 UPDATE_CIRCLE = 3600
 
 LAST_ALL_UPDATE = Youtuber.objects.all()[0].updateddate
-# LAST_ALL_UPDATE = datetime.datetime(2020, 2, 10)
 
 
 class updateThread:
@@ -66,7 +65,7 @@ class updateThread:
         global LAST_ALL_UPDATE, UPDATE_CIRCLE
         
         TIME_CHECK = datetime.datetime.now(datetime.timezone.utc)
-        
+
         if (TIME_CHECK - LAST_ALL_UPDATE).days >= 1:
             # 하루가 지나면 업데이트 시행
             print("-------------------------- UPDATE IS STARTED!")

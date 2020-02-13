@@ -18,12 +18,12 @@ def get_influence(youtuber):
 #   - kinds = 2 활동 지수 ( 최근 10개 영상 업로드 주기 )
 #   음수 값을 만든다. 
 def get_activity(youtuber, video_detail_list):
-    max_num = min(len(video_detail_list), 10)
+    max_num = min(len(video_detail_list), 9)
     datetime_list = []
     for i in range(max_num):
         datetime_list.append(datetime.datetime.strptime(video_detail_list[i]['regDate'], '%Y-%m-%d'))
-    dif_sum = 0
-    for i in range(max_num - 1):
+    dif_sum = ( datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=9) - datetime_list[0]).days
+    for i in range(1, max_num - 1):
         dif_sum += (datetime_list[i] - datetime_list[i+1]).days
     Stat.objects.create(
         yno=youtuber,

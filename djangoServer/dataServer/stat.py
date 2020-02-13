@@ -144,7 +144,7 @@ def get_charm2(video_list):
     return value
 
 def get_activity3(youtuber, video_detail_list):
-    max_num = min(len(video_detail_list), )
+    max_num = min(len(video_detail_list), 9)
     datetime_list = []
     for i in range(max_num):
         datetime_list.append(video_detail_list[i]['regDate'])

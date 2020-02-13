@@ -9,7 +9,6 @@ from decouple import config
 from urllib.request import urlopen, unquote
 import datetime
 import time
-from pytz import timezone
 
 
 def update_stat_all(request):
@@ -202,7 +201,7 @@ def make_new_youtuber(request, url):
     timer.append(timeit.default_timer())
     print('%2d. [%5.2f / %5.2f s] Video 테이블 수집'
           % (len(timer) - 1, timer[len(timer) - 1] - timer[len(timer) - 2], timer[len(timer) - 1] - timer[0]))
-    youtuber.status = 57
+    youtuber.status = 65
     youtuber.save()
 
     # 7. trend 테이블 수집
@@ -218,8 +217,7 @@ def make_new_youtuber(request, url):
             last_pointView = trend_item['pointView']
             Trend.objects.create(
                 yno=youtuber,
-                recorddate=datetime.datetime.strptime(
-                    trend_item['recordDate'], "%Y-%m-%d"),
+                recorddate=datetime.datetime.strptime(trend_item['recordDate'], "%Y-%m-%d"),
                 pointsubscriber=trend_item['pointSubscriber'],
                 difsubscriber=trend_item['difSubscriber'],
                 pointview=trend_item['pointView'],
@@ -240,8 +238,7 @@ def make_new_youtuber(request, url):
         res['code'] = -7
         return HttpResponse(json.dumps(res))
     timer.append(timeit.default_timer())
-    print('%2d. [%5.2f / %5.2f s] trend 테이블 수집'
-          % (len(timer) - 1, timer[len(timer) - 1] - timer[len(timer) - 2], timer[len(timer) - 1] - timer[0]))
+    print('%2d. [%5.2f / %5.2f s] trend 테이블 수집' % (len(timer) - 1, timer[len(timer) - 1] - timer[len(timer) - 2], timer[len(timer) - 1] - timer[0]))
     youtuber.status = 73
     youtuber.save()
 
@@ -421,6 +418,7 @@ def yno_from_url(request, url):
 def status_from_yno(request, yno):
     res = {}
     res['status'] = Youtuber.objects.get(yno=yno).status
+    res['subscriber'] =  Youtuber.objects.get(yno=yno).subscriber
     return HttpResponse(json.dumps(res))
 
 def update_stat_without_request():

@@ -4,18 +4,15 @@ from django.shortcuts import render, HttpResponse
 from django.db.models import Count
 from .models import *
 from .stat import get_influence, get_activity, get_trend, get_views, get_charm, get_grade
-import urllib.request
-import requests
 from decouple import config
+import requests
+import urllib.request
 from urllib.request import urlopen, unquote
 from bs4 import BeautifulSoup as bs
 import json
 import copy
 import timeit
 import datetime
-from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
-from IPython import embed
 
 
 GOOGLE_KEY_LIST = [config('GOOGLEAPIKEY5'), config('GOOGLEAPIKEY7'), config('GOOGLEAPIKEY6'), config('GOOGLEAPIKEY8'), config('GOOGLEAPIKEY1'), config('GOOGLEAPIKEY2'), config('GOOGLEAPIKEY3'), config('GOOGLEAPIKEY4'), config('GOOGLEAPIKEY9')]
@@ -87,6 +84,44 @@ def get_channel_other_sites(input_url):
     return other_link_list
 
 
+def get_trend_list(channel_id):
+    trends = []
+    str_date = (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=9) + datetime.timedelta(days=-30)).strftime('%Y-%m-%d')
+    url = 'https://en.noxinfluencer.com/api/youtube/detail/dimension/?channelId=' + channel_id + '&&startDate=' + str_date
+    r = requests.get(url)
+    html = json.loads(r.text)['retData']['dom']
+    if json.loads(r.text)['errorNum'] != 0:
+        print('errer')
+        return trends
+    soup = bs(html, "html.parser", from_encoding='utf-8')
+    ul_list = soup.findAll('ul')
+    for idx in range(1, len(ul_list) - 2):
+        data = {}
+        li_list = ul_list[idx].findAll('li')
+        for (i, li) in enumerate(li_list):
+            if i == 0:
+                data['recordDate'] = li.text
+            elif i == 1:
+                span_list = li.findAll('span')
+                if len(span_list) == 1:
+                    data['pointSubscriber'] = get_real_value(span_list[0].text)
+                    data['difSubscriber'] = 0
+                else:
+                    data['pointSubscriber'] = get_real_value(span_list[0].text)
+                    data['difSubscriber'] = get_real_value(span_list[1].text)
+            elif i == 2:
+                span_list = li.findAll('span')
+                if len(span_list) == 1:
+                    data['pointView'] = get_real_value(span_list[0].text)
+                    data['difView'] = 0
+                else:
+                    data['pointView'] = get_real_value(span_list[0].text)
+                    data['difView'] = get_real_value(span_list[1].text)
+                break
+        trends.append(data)
+    return trends
+
+
 def get_channel_info(channelID):
     global GOOGLE_KEY_INDEX
     global GOOGLE_KEY_LIST
@@ -116,7 +151,6 @@ def get_channel_info(channelID):
     channel_info_dict["viewCount"] = statistics["viewCount"]
     channel_info_dict["subscriberCount"] = statistics["subscriberCount"]
     channel_info_dict["videoCount"] = statistics["videoCount"]
-
     branding_settings = info_obj["brandingSettings"]
     channel_info_dict['banner_url'] = branding_settings["image"]["bannerImageUrl"]
     if '/default_banner' in channel_info_dict['banner_url']:
@@ -127,72 +161,20 @@ def get_channel_info(channelID):
     return channel_info_dict
 
 
-def get_trend_list(channel_id):
-    options = webdriver.ChromeOptions()
-    options.add_argument('--no-sandbox')
-    options.add_argument('--headless')
-    options.add_argument('--disable-dev-shm-usage')
-    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko")
-    # options.add_argument("user-agent=Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36")
-    # driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', options=options) # this is for Ubuntu but access is denied.
-    driver = webdriver.Chrome('./chromedriver', options=options)
-    url = 'https://socialblade.com/youtube/channel/' + channel_id + '/monthly'
-    driver.get(url)
-    el = '//*[@id="socialblade-user-content"]'
-    orm = []
-    try:
-        embed()
-        content = driver.find_element_by_xpath(el).text.split('\n')
-        cnt = 0
-        flag = False
-        pk = 0
-        data = dict()
-        for line in content:
-            if line == 'ESTIMATED EARNINGS':
-                flag = True
-                continue
-            elif line == 'Daily Averages':
-                break
-            if flag:
-                if cnt == 1:
-                    cnt += 1
-                    continue
-                if cnt == 6:
-                    pk += 1
-                    temp = copy.deepcopy(data)
-                    orm.append(temp)
-                    cnt = 0
-                    continue
-                elif cnt == 0:
-                    data['recordDate'] = line
-                    cnt += 1
-                else:
-                    x = line.replace('+', "").replace(",", "").replace('--', '0').replace('LIVE', '')
-                    total_stars = 0
-                    if 'K' in x:
-                        if len(x) > 1:
-                            # convert k to a thousand
-                            total_stars = float(x.replace('K', '')) * 1000
-                    elif 'M' in x:
-                        if len(x) > 1:
-                            # convert M to a million
-                            total_stars = float(x.replace('M', '')) * 1000000
-                    else:
-                        total_stars = int(x)  # Less than 1000
-                    if cnt == 2:
-                        data['difSubscriber'] = int(total_stars)
-                    elif cnt == 3:
-                        data['pointSubscriber'] = int(total_stars)
-                    elif cnt == 4:
-                        data['difView'] = int(total_stars)
-                    elif cnt == 5:
-                        data['pointView'] = int(total_stars)
-                    cnt += 1
-    except NoSuchElementException as e:
-        print(e)
-        pass
-    driver.close()
-    return orm
+def get_real_value(txt):
+    txt = txt.strip()
+    value = 0
+    if txt.isdigit():
+        value = int(txt)
+    if txt[len(txt) - 1] == 'M':
+        value = float(txt.strip()[:-1]) * 1000000
+    elif txt[len(txt) - 1] == 'K':
+        value = float(txt.strip()[:-1]) * 1000
+    elif txt[len(txt) - 1] == 'B':
+        value = float(txt.strip()[:-1]) * 1000000000
+    return round(value)
+
+
 
 
 def get_video_list(uploads_id):

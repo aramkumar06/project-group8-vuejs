@@ -1,5 +1,6 @@
 import datetime
 from .models import *
+import math
 
 
 #   - kinds = 1 파급력 ( (커뮤니티 언급수(그래프) + 뉴스언급수), 구독자수, 조회수)
@@ -37,7 +38,7 @@ def get_trend(youtuber, last_month_trend, today_trend):
     if last_month_trend == None:
         value = 0
     else:
-        value = (int(today_trend.pointsubscriber) - int(last_month_trend.pointsubscriber))/int(last_month_trend.pointsubscriber)*100
+        value = (int(today_trend.pointsubscriber) - int(last_month_trend.pointsubscriber))/int(last_month_trend.pointsubscriber) * math.log(int(youtuber.subscriber))
     Stat.objects.create(
         yno=youtuber,
         kinds=3,
@@ -51,7 +52,7 @@ def get_views(youtuber, last_month_trend, today_trend):
     if last_month_trend == None:
         value = 0
     else:
-        value = int(today_trend.pointview) - int(last_month_trend.pointview)
+        value = (int(today_trend.pointview) - int(last_month_trend.pointview))/int(last_month_trend.pointview) * math.log(int(youtuber.subscriber))
     Stat.objects.create(
         yno=youtuber,
         kinds=4,
@@ -61,14 +62,18 @@ def get_views(youtuber, last_month_trend, today_trend):
 
 #   - 호감도 ( 좋아요 수, 총 영상의 좋아요, 싫어요 비율, 댓글 수 )
 def get_charm(video_list):
+    count = 0
     good = 0
     bad = 0
     value = 0
     for video in video_list:
+        count += 1
         if not video['good'] or video['good'] == None:
             continue
         good += int(video['good'])
         bad += int(video['bad'])
+        if count == 10:
+            break
     if good + bad == 0:
         value = 0
     else:
@@ -77,7 +82,7 @@ def get_charm(video_list):
 
 #   - kinds = 0 등급 
 def get_grade(youtuber, stat_influence, stat_activity, stat_trend, stat_views, stat_charm):
-    value = (stat_influence + stat_activity + stat_trend*0.7 + stat_views*0.7 + stat_charm*0.5)/5
+    value = (stat_influence + stat_activity + stat_trend*0.7 + stat_views*0.7 + stat_charm)/5
     Stat.objects.create(
         yno=youtuber,
         kinds=0,

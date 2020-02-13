@@ -144,11 +144,11 @@ def get_charm2(video_list):
     return value
 
 def get_activity3(youtuber, video_detail_list):
-    max_num = min(len(video_detail_list), 10)
+    max_num = min(len(video_detail_list), )
     datetime_list = []
     for i in range(max_num):
         datetime_list.append(video_detail_list[i]['regDate'])
-    dif_sum = 0
+    dif_sum = dif_sum = ( datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=9) - datetime_list[0]).days
     for i in range(max_num - 1):
         dif_sum += (datetime_list[i] - datetime_list[i+1]).days
     Stat.objects.create(

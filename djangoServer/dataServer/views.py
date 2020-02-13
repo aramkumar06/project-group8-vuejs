@@ -36,16 +36,14 @@ def update_stat_all(request):
 
         youtuber.influence = get_influence(youtuber)
         youtuber.activity = get_activity3(youtuber, video_detail_list)
-        youtuber.viewcounttrend = get_views(
-            youtuber, last_month_trend, today_trend)
-        youtuber.subscribercounttrend = get_trend(
-            youtuber, last_month_trend, today_trend)
+        youtuber.viewcounttrend = get_views(youtuber, last_month_trend, today_trend)
+        youtuber.subscribercounttrend = get_trend(youtuber, last_month_trend, today_trend)
         youtuber.charm = get_charm(video_detail_list)
         youtuber.grade = get_grade(youtuber, youtuber.influence, youtuber.activity,
                                    youtuber.subscribercounttrend, youtuber.viewcounttrend, youtuber.charm)
         youtuber.save()
         print('| %9d | %9d | %9d | %9d | %9d | %9d |' % (youtuber.yno, youtuber.influence, youtuber.activity, youtuber.subscribercounttrend, youtuber.viewcounttrend, youtuber.charm))
-    return HttpResponse(0)
+    return HttpResponse('stat을 업데이트 하였습니다.')
 
 
 '''

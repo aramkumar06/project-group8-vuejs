@@ -9,7 +9,6 @@ from decouple import config
 from urllib.request import urlopen, unquote
 import datetime
 import time
-from pytz import timezone
 
 
 def update_stat_all(request):

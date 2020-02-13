@@ -13,8 +13,6 @@ import json
 import copy
 import timeit
 import datetime
-from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
 
 
 GOOGLE_KEY_LIST = [config('GOOGLEAPIKEY5'), config('GOOGLEAPIKEY7'), config('GOOGLEAPIKEY6'), config('GOOGLEAPIKEY8'), config('GOOGLEAPIKEY1'), config('GOOGLEAPIKEY2'), config('GOOGLEAPIKEY3'), config('GOOGLEAPIKEY4'), config('GOOGLEAPIKEY9')]

@@ -43,7 +43,7 @@ def update_stat_all(request):
                                    youtuber.subscribercounttrend, youtuber.viewcounttrend, youtuber.charm)
         youtuber.save()
         print('| %9d | %9d | %9d | %9d | %9d | %9d |' % (youtuber.yno, youtuber.influence, youtuber.activity, youtuber.subscribercounttrend, youtuber.viewcounttrend, youtuber.charm))
-    return HttpResponse('stat을 업데이트 하였습니다.')
+    return HttpResponse('stat을 업데이트 하였습니다. update V1.0')
 
 
 '''
@@ -355,11 +355,17 @@ def make_new_youtuber(request, url):
 
     try:
         stat_influence = get_influence(youtuber)
+        print('stat_influence')
         stat_activity = get_activity(youtuber, video_detail_list)
+        print('get_activity')
         stat_trend = get_trend(youtuber, last_month_trend, today_trend)
+        print('get_trend')
         stat_views = get_views(youtuber, last_month_trend, today_trend)
+        print('get_views')
         stat_charm = get_charm(video_detail_list)
+        print('get_charm')
         grade = get_grade(youtuber, stat_influence, stat_activity, stat_trend, stat_views, stat_charm)
+        print('get_grade')
     except Exception as e:
         print('* Exception :', e)
         youtuber.delete()

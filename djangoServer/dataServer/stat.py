@@ -22,6 +22,10 @@ def get_activity(youtuber, video_detail_list):
     datetime_list = []
     for i in range(max_num):
         datetime_list.append(datetime.datetime.strptime(video_detail_list[i]['regDate'], '%Y-%m-%d'))
+    print("video_detail_list[0]['regDate'] (type, value) : ", type(video_detail_list[0]['regDate']), video_detail_list[0]['regDate'])
+    print(" datetime_list[0] (type, value) : ", type(datetime_list[0]),  datetime_list[0])
+    print(" datetime_list[0] (type, value) : ", type(datetime_list[0]),  datetime_list[0])
+    print(" (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=9)).date() : ", type((datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=9)).date()), (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=9)).date())
     dif_sum = dif_sum = ((datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=9)).date() - datetime_list[0]).days
     for i in range(1, max_num - 1):
         dif_sum += (datetime_list[i] - datetime_list[i+1]).days

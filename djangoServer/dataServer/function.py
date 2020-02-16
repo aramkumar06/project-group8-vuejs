@@ -403,8 +403,10 @@ CANO_MAPPING = {
 
 
 def get_our_cano(ycano_list, video_detail_list):
+    print(get_our_cano)
     our_list = []
     for ycano in ycano_list:
+        print('ycano : ', ycano)
         if str(ycano) in list(CANO_MAPPING.keys()):
             if CANO_MAPPING[str(ycano)] not in our_list:
                 our_list.append(CANO_MAPPING[str(ycano)])

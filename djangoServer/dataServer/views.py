@@ -253,6 +253,7 @@ def make_new_youtuber(request, url):
     youtuber.save()
 
     # 9 get our category (에러날일이 없다)
+    print('i"m go get_our_cano')
     our_cano_list = get_our_cano(valid_ycano_list, video_detail_list)
     timer.append(timeit.default_timer())
     print('%2d. [%5.2f / %5.2f s] get our category'

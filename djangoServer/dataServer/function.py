@@ -405,36 +405,33 @@ CANO_MAPPING = {
 def get_our_cano(ycano_list, video_detail_list):
     our_list = []
     for ycano in ycano_list:
+        print('ycano : ', ycano)
         if str(ycano) in list(CANO_MAPPING.keys()):
             if CANO_MAPPING[str(ycano)] not in our_list:
                 our_list.append(CANO_MAPPING[str(ycano)])
-        elif ycano == 1 or ycano == 24:
-            count = 0
+        if ycano == 1 or ycano == 24 or ycano == 22:
+            count_kids = 0
+            count_muk = 0
             for keyword in ['kids', '키즈', '어린이', '장난감', '토이']:
                 for video_detail in video_detail_list:
-                    if keyword in video_detail['videoName']:
-                        count += 1
-            if count >= len(video_detail_list) * 0.2:
-                if 6 not in our_list:
-                    our_list.append(6)
-            else:
-                if 2 not in our_list:
-                    our_list.append(2)
-        elif ycano == 22:
-            count = 0
+                    if keyword in video_detail['videoName'].lower():
+                        count_kids += 1
             for keyword in ['mukbang', '먹방', '음식', 'food', '맛있']:
                 for video_detail in video_detail_list:
-                    if keyword in video_detail['videoName']:
-                        count += 1
-            if count >= len(video_detail_list) * 0.2:
+                    print('keyword : %s, title : %s, result : %s' % (keyword, video_detail['videoName'].lower(), keyword in video_detail['videoName'].lower()))
+                    if keyword in video_detail['videoName'].lower():
+                        count_muk += 1
+            if count_kids >= len(video_detail_list) * 0.2:
+                if 6 not in our_list:
+                    our_list.append(6)
+            elif count_muk >= len(video_detail_list) * 0.2:
                 if 5 not in our_list:
                     our_list.append(5)
             else:
-                if 8 not in our_list:
-                    our_list.append(8)
-        else:
-            if 0 not in our_list:
-                our_list.append(0)
+                if 2 not in our_list:
+                    our_list.append(2)
+            print('count_kids : ', count_kids)
+            print('count_muk : ', count_muk)
     return our_list
 
 

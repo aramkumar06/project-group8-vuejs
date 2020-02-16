@@ -409,7 +409,7 @@ def get_our_cano(ycano_list, video_detail_list):
         if str(ycano) in list(CANO_MAPPING.keys()):
             if CANO_MAPPING[str(ycano)] not in our_list:
                 our_list.append(CANO_MAPPING[str(ycano)])
-        elif ycano == 1 or ycano == 24:
+        if ycano == 1 or ycano == 24:
             count = 0
             for keyword in ['kids', '키즈', '어린이', '장난감', '토이']:
                 for video_detail in video_detail_list:
@@ -422,7 +422,7 @@ def get_our_cano(ycano_list, video_detail_list):
                 if 2 not in our_list:
                     our_list.append(2)
             print('count : ', count)
-        elif ycano == 22 or ycano == 24:
+        if ycano == 22 or ycano == 24:
             count = 0
             for keyword in ['mukbang', '먹방', '음식', 'food', '맛있']:
                 for video_detail in video_detail_list:

@@ -403,7 +403,6 @@ CANO_MAPPING = {
 
 
 def get_our_cano(ycano_list, video_detail_list):
-    print(get_our_cano)
     our_list = []
     for ycano in ycano_list:
         print('ycano : ', ycano)
@@ -422,7 +421,8 @@ def get_our_cano(ycano_list, video_detail_list):
             else:
                 if 2 not in our_list:
                     our_list.append(2)
-        elif ycano == 22:
+            print('count : ', count)
+        elif ycano == 22 or ycano == 24:
             count = 0
             for keyword in ['mukbang', '먹방', '음식', 'food', '맛있']:
                 for video_detail in video_detail_list:

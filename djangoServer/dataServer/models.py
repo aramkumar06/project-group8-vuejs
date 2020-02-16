@@ -83,6 +83,9 @@ class Category(models.Model):
         managed = False
         db_table = 'category'
 
+    def __str__(self):
+        return self.name
+
 
 class CategoryYoutubeRelation(models.Model):
     cyno = models.AutoField(primary_key=True)
@@ -105,6 +108,9 @@ class Community(models.Model):
     class Meta:
         managed = False
         db_table = 'community'
+
+    def __str__(self):
+        return self.articletitle
 
 
 class DjangoAdminLog(models.Model):
@@ -208,6 +214,9 @@ class News(models.Model):
         managed = False
         db_table = 'news'
 
+    def __str__(self):
+        return self.newstitle
+
 
 class Stat(models.Model):
     sno = models.AutoField(primary_key=True)
@@ -282,6 +291,9 @@ class Video(models.Model):
         managed = False
         db_table = 'video'
 
+    def __str__(self):
+        return self.videoname
+
 
 class YoutubeCategory(models.Model):
     ycano = models.IntegerField(primary_key=True)
@@ -327,3 +339,6 @@ class Youtuber(models.Model):
     class Meta:
         managed = False
         db_table = 'youtuber'
+
+    def __str__(self):
+        return self.channelname

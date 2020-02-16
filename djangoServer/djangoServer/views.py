@@ -49,8 +49,8 @@ MONTH = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct
 
 UPDATE_CIRCLE = 3600
 
-LAST_ALL_UPDATE = Youtuber.objects.all()[0].updateddate
-# LAST_ALL_UPDATE = datetime.datetime(2020, 2, 10)
+LAST_ALL_UPDATE = Youtuber.objects.all().order_by('-yno')[0].updateddate
+# LAST_ALL_UPDATE = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=2)
 
 
 class updateThread:
@@ -71,7 +71,8 @@ class updateThread:
             # 하루가 지나면 업데이트 시행
             print("-------------------------- UPDATE IS STARTED!")
             START = datetime.datetime.now() # 시작 시간
-            youtubers = Youtuber.objects.all()
+            youtubers = Youtuber.objects.all().order_by('yno')
+            print('Total Youtuber is {}'.format(len(youtubers)))
             left_google_api_keys = len(GOOGLE_KEY_LIST)
             for  youtuber in youtubers:
                 print("-------------------------- Youtuber {}'s update is started!".format(youtuber.yno))
@@ -130,12 +131,11 @@ class updateThread:
                 
                 ################# 트렌드 새로운 열 추가
                 target_youtuber = Youtuber.objects.get(yno=youtuber.yno)
-                
-                last_trend = Trend.objects.all().filter(yno=youtuber).order_by('-recorddate')[0]
+                last_trend = Trend.objects.filter(yno=youtuber).order_by('-recorddate')[0]
                 last_date = last_trend.recorddate
+                print('************* last date is {}*************'.format(last_date))
                 
-                
-                if last_date.day != now.day and last_date.month != now.month and last_date.year != now.year: 
+                if (now - last_date).days >= 1:
                     last_subscriber = last_trend.pointsubscriber
                     last_pointview = last_trend.pointview
                     

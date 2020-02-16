@@ -150,7 +150,39 @@
               <v-card outlined flat>
                 <v-row>
                   <v-col class="ma-5">
-                    <v-list-item-title class="headline font-weight-black mb-1">능력치</v-list-item-title>
+                    <v-list-item-title class="headline font-weight-black mb-1">
+                      능력치
+                      <v-dialog v-model="dialog" width="600">
+                        <template v-slot:activator="{ on }">
+                          <v-btn class="ma-2" outlined x-small fab color="pink" v-on="on" ><v-icon>mdi-help</v-icon></v-btn>
+                        </template>
+
+                        <v-card>
+                          <v-card-title class="headline grey lighten-2"  primary-title >
+                            <v-btn class="ma-2" outlined x-small fab color="pink" v-on="on" >
+                              <v-icon>mdi-info</v-icon>
+                            </v-btn>
+                            능력치 측정 기준
+                          </v-card-title>
+                          <v-card-text><br>
+                            *영향력:<b>언급수 (커뮤니티 + 뉴스), 구독자수, 조회수</b>에 의해 결정됩니다
+                            <br><br>
+                            *활동력:<b>최근 영상 주기</b>에 의해 결정됩니다
+                            <br><br>
+                            *영상조회수증감추이:<b>한 달전의 조회수 변화 비율과 구독자 수</b>에 의해 결정됩니다
+                            <br><br>
+                            *구독자증감추이:<b>한 달전의 구독자 변화 비율과 구독자 수</b>에 의해 결정됩니다
+                            <br><br>
+                            *호감도:<b>최근 영상 10개의 좋아요, 싫어요 비율</b>에 의해 결정됩니다
+                          </v-card-text>
+                          <v-divider></v-divider>
+                          <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn color="primary" text @click="dialog = false" >닫기</v-btn>
+                          </v-card-actions>
+                        </v-card>
+                      </v-dialog>
+                    </v-list-item-title>
                     <v-divider></v-divider>
                   </v-col>
                 </v-row>
@@ -780,6 +812,7 @@ export default {
   computed: {},
   data() {
     return {
+      dialog: false,
       youtuber: {},
       mainData: [],
       chartOptions: {
@@ -803,7 +836,10 @@ export default {
           opacity: 0.4
         },
         markers: {
-          size: 0
+          // size: 5,
+          // hover: {
+          //   size: 10
+          // },
         },
         xaxis: {
           categories: [
@@ -818,7 +854,7 @@ export default {
               fontSize: "20px",
               colors: ["black", "black", "black", "black", "black"],
               fontFamily: "bold"
-            }
+            },
           }
         },
         yaxis: {
@@ -835,7 +871,47 @@ export default {
         },
         animations: {
           enabled: false
-        }
+        },
+        tooltip:{
+          // shared: false,
+          intersect: true,
+          enabled: true,
+          followCursor: true,
+          fillSeriesColor: true,
+          marker:{
+            show: true
+          },
+          // onDatasetHover: {
+          //   highlightDataSeries: true,
+          // },
+          custom: function({series, seriesIndex, dataPointIndex}) {
+            
+            var result = '<div class="arrow_box"><span>'
+            switch (dataPointIndex) {
+              case 0: // 영향력
+                result += '영향력은 <b>"언급수 (커뮤니티 + 뉴스), 구독자수, 조회수"</b>에 의해 결정됩니다.'
+                break;
+              case 1: // 활동력
+                result += '활동력은 <b>"최근 영상 주기"</b>에 의해 결정됩니다.'
+                break;
+              case 2: // 영상조회수증감추이
+                result += '영상조회수증감추이는 <b>"한 달전의 조회수 변화 비율과 구독자 수"</b>에 의해 결정됩니다.'
+                break;
+              case 3: // 구독자증감추이
+                result += '구독자증감추이는 <b>"한 달전의 구독자 변화 비율과 구독자 수"</b>에 의해 결정됩니다.'
+                break;
+              case 4: // 호감도
+                result += '호감도는 <b>"최근 영상 10개의 좋아요, 싫어요 비율"</b>에 의해 결정됩니다.'
+                break;
+              default:
+                console.log(series, seriesIndex)
+            }
+            return result + '</span></div>'
+          },
+          x:{
+            show:true
+          }
+        },
       },
       activityOptions: {
         series: [],

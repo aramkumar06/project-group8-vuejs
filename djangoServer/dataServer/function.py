@@ -432,6 +432,7 @@ def get_our_cano(ycano_list, video_detail_list):
             else:
                 if 8 not in our_list:
                     our_list.append(8)
+            print('count : ', count)
         else:
             if 0 not in our_list:
                 our_list.append(0)

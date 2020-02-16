@@ -414,12 +414,12 @@ def get_our_cano(ycano_list, video_detail_list):
             count_muk = 0
             for keyword in ['kids', '키즈', '어린이', '장난감', '토이']:
                 for video_detail in video_detail_list:
-                    if keyword in video_detail['videoName'].toLowerCase():
+                    if keyword in video_detail['videoName'].lower():
                         count_kids += 1
             for keyword in ['mukbang', '먹방', '음식', 'food', '맛있']:
                 for video_detail in video_detail_list:
-                    print('keyword : %s, title : %s, result : %s' % (keyword, video_detail['videoName'].toLowerCase(), keyword in video_detail['videoName'].toLowerCase()))
-                    if keyword in video_detail['videoName'].toLowerCase():
+                    print('keyword : %s, title : %s, result : %s' % (keyword, video_detail['videoName'].lower(), keyword in video_detail['videoName'].lower()))
+                    if keyword in video_detail['videoName'].lower():
                         count_muk += 1
             if count_kids >= len(video_detail_list) * 0.2:
                 if 6 not in our_list:

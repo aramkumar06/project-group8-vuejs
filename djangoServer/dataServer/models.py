@@ -335,6 +335,7 @@ class Youtuber(models.Model):
     uploadsid = models.CharField(db_column='uploadsID', max_length=100, blank=True, null=True)
     searchkeyword = models.CharField(db_column='searchKeyword', max_length=100, blank=True, null=True)
     status = models.IntegerField(db_column='status', blank=True, null=True)
+    tagcloud = models.CharField(max_length=7000, blank=True, null=True)
 
     class Meta:
         managed = False

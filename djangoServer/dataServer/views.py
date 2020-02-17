@@ -380,7 +380,31 @@ def make_new_youtuber(request, url):
     youtuber.status = 100
     youtuber.save()
 
-    # 15. 유튜버의 스텟, 등급, updatedDate 갱신
+    # 15. 태그클라우드 추가 {"word": count, "word": count}
+    videos = Video.objects.filter(yno=youtuber)
+    words_count = {}
+    for video in videos:
+        tags = (video.tags).split(',')
+        for tag in tags:
+            if words_count.get(tag):
+                words_count[tag] += 1
+            else:
+                words_count[tag] = 1
+                
+    delete_words = [] # 1개 이하를 지운다.
+    for word, count in words_count.items(): 
+        if count <= 1:
+            delete_words.append(word)
+    for delete_word in delete_words:
+        del words_count[delete_word]
+        
+    result = json.dumps(words_count, ensure_ascii=False) if words_count else ''
+    youtuber.tagcloud = result
+    youtuber.save()
+    print('{}. tag cloud is added.'.format(len(timer)))
+
+
+    # 16. 유튜버의 스텟, 등급, updatedDate 갱신
     try:
         now = datetime.datetime.now()
         youtuber.influence = stat_influence
@@ -402,8 +426,7 @@ def make_new_youtuber(request, url):
         res['code'] = -12
         return HttpResponse(json.dumps(res))
     return HttpResponse(json.dumps(res))
-
-#-------------------------------------------------------------------------------------------------------------------------#
+    #-------------------------------------------------------------------------------------------------------------------------#
 #*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*#
 #-------------------------------------------------------------------------------------------------------------------------#
 

@@ -49,8 +49,8 @@ MONTH = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct
 
 UPDATE_CIRCLE = 3600
 
-LAST_ALL_UPDATE = Youtuber.objects.all().order_by('-yno')[0].updateddate
-# LAST_ALL_UPDATE = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=2)
+# LAST_ALL_UPDATE = Youtuber.objects.all().order_by('-yno')[0].updateddate
+LAST_ALL_UPDATE = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=2)
 
 
 class updateThread:
@@ -72,6 +72,7 @@ class updateThread:
             print("-------------------------- UPDATE IS STARTED!")
             START = datetime.datetime.now() # 시작 시간
             youtubers = Youtuber.objects.all().order_by('yno')
+            # youtubers = Youtuber.objects.all().filter(yno=727)
             print('Total Youtuber is {}'.format(len(youtubers)))
             left_google_api_keys = len(GOOGLE_KEY_LIST)
             for  youtuber in youtubers:
@@ -408,7 +409,7 @@ class updateThread:
                         clickcount = 0,
                     )
                     new_news.save()
-                    print("------------- youtuber {}'s news is added!".format(youtuber.yno))                                
+                    print("------------- youtuber {}'s news is added!".format(youtuber.yno))
                 print("------------- youtuber {}'s news aricles update is done!".format(youtuber.yno))
                 
                 ############## 데이터랩 가져오기
@@ -475,6 +476,31 @@ class updateThread:
                         NAVER_DATA_ID_INDEX %= len(NAVER_ID_LIST)
                         left_NAVER_DATA_ID -= 1            
                 print("------------- youtuber {}'s naver datalab update is done!".format(youtuber.yno))
+                
+                ############## 태그 클라우드 추가하기
+                tag_videos = Video.objects.filter(yno=youtuber)
+                tagCloud = {}
+                for video in tag_videos:
+                    tags = (video.tags).split(',')
+                    for tag in tags:
+                        if tagCloud.get(tag):
+                            tagCloud[tag] += 1
+                        else:
+                            tagCloud[tag] = 1
+                            
+                if tagCloud.get(''):
+                    del tagCloud['']
+                
+                delete_words = [] # 1개 이하를 지운다.
+                for word, count in tagCloud.items(): 
+                    if count <= 1:
+                        delete_words.append(word)
+                for delete_word in delete_words:
+                    del tagCloud[delete_word]
+                result = json.dumps(tagCloud, ensure_ascii=False) if tagCloud else ''
+                youtuber.tagcloud = result
+                youtuber.save()
+                print("------------- youtuber {}'s tagCloud is added!".format(youtuber.yno))
                 print('---- youtuber {} takes {}.'.format(youtuber.yno, datetime.datetime.now() - ONE_START))
             
             ########### 스탯 업데이트 한 꺼번에 전부
@@ -483,6 +509,7 @@ class updateThread:
             print("------------- stat update is done!".format(youtuber.yno))
             print('total update takes {}.'.format(datetime.datetime.now() - START))
             ########## 모두 끝나고, 업데이트 주기 다시 실행!
+            LAST_ALL_UPDATE = Youtuber.objects.all().order_by('-yno')[0].updateddate
             threading.Timer(UPDATE_CIRCLE, self.threadOpen).start()
         else:
             print('update not yet')

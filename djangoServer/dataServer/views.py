@@ -25,7 +25,8 @@ def update_stat_all(request):
             temp['good'] = video.good
             temp['bad'] = video.bad
             video_detail_list.append(temp)
-        now = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=9)
+        now = datetime.datetime.now(
+            datetime.timezone.utc) + datetime.timedelta(hours=9)
         trends = Trend.objects.filter(yno=youtuber).order_by('-recorddate')
         last_month_trend = None
         for trend in trends:
@@ -36,13 +37,16 @@ def update_stat_all(request):
 
         youtuber.influence = get_influence(youtuber)
         youtuber.activity = get_activity3(youtuber, video_detail_list)
-        youtuber.viewcounttrend = get_views(youtuber, last_month_trend, today_trend)
-        youtuber.subscribercounttrend = get_trend(youtuber, last_month_trend, today_trend)
+        youtuber.viewcounttrend = get_views(
+            youtuber, last_month_trend, today_trend)
+        youtuber.subscribercounttrend = get_trend(
+            youtuber, last_month_trend, today_trend)
         youtuber.charm = get_charm(video_detail_list)
         youtuber.grade = get_grade(youtuber, youtuber.influence, youtuber.activity,
                                    youtuber.subscribercounttrend, youtuber.viewcounttrend, youtuber.charm)
         youtuber.save()
-        print('| %9d | %9d | %9d | %9d | %9d | %9d |' % (youtuber.yno, youtuber.influence, youtuber.activity, youtuber.subscribercounttrend, youtuber.viewcounttrend, youtuber.charm))
+        print('| %9d | %9d | %9d | %9d | %9d | %9d |' % (youtuber.yno, youtuber.influence,
+                                                         youtuber.activity, youtuber.subscribercounttrend, youtuber.viewcounttrend, youtuber.charm))
     return HttpResponse('stat을 업데이트 하였습니다. update V1.0')
 
 
@@ -78,7 +82,8 @@ def make_new_youtuber(request, url):
         res['code'] = -1
         return HttpResponse(json.dumps(res))
     timer.append(timeit.default_timer())
-    print('%2d. [%5.2f / %5.2f s] Determine the correct YouTube channel URL' % (len(timer) - 1, timer[len(timer) - 1] - timer[len(timer) - 2], timer[len(timer) - 1] - timer[0]))
+    print('%2d. [%5.2f / %5.2f s] Determine the correct YouTube channel URL' % (len(timer) -
+                                                                                1, timer[len(timer) - 1] - timer[len(timer) - 2], timer[len(timer) - 1] - timer[0]))
 
     # 2. URL로부터 channel ID 얻기
     try:
@@ -206,43 +211,61 @@ def make_new_youtuber(request, url):
     today_trend = None
     try:
         trend_list = get_trend_list(channel_id)
-        last_pointSubscriber = 0
-        last_pointView = 0
+        data = {
+            'recordDate': datetime.datetime(today.year, today.month, today.day, 0, 0, 0).strftime("%Y-%m-%d"),
+            'pointSubscriber': youtuber.subscriber,
+            'difSubscriber': 0,
+            'pointView': youtuber.totalviewcount,
+            'difView': 0
+        }
+        trend_list.append(data)
+        print('trend 수집 로직 업데이트')
+        trend_list.reverse()
         for (i, trend_item) in enumerate(trend_list):
-            if i == len(trend_list):
+            print('trend_item :', trend_item)
+            if i == len(trend_list) - 1:
+                trend_list[i]['difSubscriber'] = 0
+                trend_list[i]['pointView'] = 0
                 break
-            last_pointSubscriber = trend_item['pointSubscriber']
-            last_pointView = trend_item['pointView']
-            Trend.objects.create(
-                yno=youtuber,
-                recorddate=datetime.datetime.strptime(trend_item['recordDate'], "%Y-%m-%d"),
-                pointsubscriber=trend_item['pointSubscriber'],
-                difsubscriber=trend_item['difSubscriber'],
-                pointview=trend_item['pointView'],
-                difview=trend_item['difView']
-            )
-        today_trend = Trend(
-            yno=youtuber,
-            recorddate=datetime.datetime(today.year, today.month, today.day, 0, 0, 0),
-            pointsubscriber=youtuber.subscriber,
-            difsubscriber=int(youtuber.subscriber) - last_pointSubscriber,
-            pointview=youtuber.totalviewcount,
-            difview=int(youtuber.totalviewcount) - last_pointView,
-        )
-        today_trend.save()
+            else:
+                trend_list[i+1]['pointSubscriber'] = int(trend_list[i]['pointSubscriber']) - int(trend_list[i+1]['difSubscriber'])
+                trend_list[i]['difSubscriber'] = int(trend_list[i+1]['difSubscriber'])
+                trend_list[i+1]['pointView'] = int(trend_list[i]['pointView']) - int(trend_list[i+1]['difView'])
+                trend_list[i]['difView'] = int(trend_list[i+1]['difView'])
+            if i == 0:
+                today_trend = Trend(
+                    yno=youtuber,
+                    recorddate=datetime.datetime.strptime(trend_item['recordDate'], "%Y-%m-%d"),
+                    pointsubscriber=trend_item['pointSubscriber'],
+                    difsubscriber=trend_item['difSubscriber'],
+                    pointview=trend_item['pointView'],
+                    difview=trend_item['difView']
+                )
+                today_trend.save()
+            else:
+                Trend.objects.create(
+                    yno=youtuber,
+                    recorddate=datetime.datetime.strptime(trend_item['recordDate'], "%Y-%m-%d"),
+                    pointsubscriber=trend_item['pointSubscriber'],
+                    difsubscriber=trend_item['difSubscriber'],
+                    pointview=trend_item['pointView'],
+                    difview=trend_item['difView']
+                )
     except Exception as e:
         print(e)
         youtuber.delete()
         res['code'] = -7
         return HttpResponse(json.dumps(res))
     timer.append(timeit.default_timer())
-    print('%2d. [%5.2f / %5.2f s] trend 테이블 수집' % (len(timer) - 1, timer[len(timer) - 1] - timer[len(timer) - 2], timer[len(timer) - 1] - timer[0]))
+    print('%2d. [%5.2f / %5.2f s] trend 테이블 수집' % (len(timer) - 1,
+                                                   timer[len(timer) - 1] - timer[len(timer) - 2], timer[len(timer) - 1] - timer[0]))
     youtuber.status = 73
     youtuber.save()
 
     # 8 calculate valid ycano list
     valid_ycano_list = []
-    tmp_ycano_list = Video.objects.filter(yno=yno).values('ycano').annotate(total=Count('ycano')).order_by('total').reverse()
+    tmp_ycano_list = Video.objects.filter(yno=yno).values(
+        'ycano').annotate(total=Count('ycano')).order_by('total').reverse()
     for ycategory in tmp_ycano_list:
         if ycategory['total'] >= len(video_detail_list) * 0.11:
             valid_ycano_list.append(ycategory['ycano'])
@@ -282,7 +305,8 @@ def make_new_youtuber(request, url):
 
     # 11 news 테이블 수집
     try:
-        news_list = get_news_list(youtuber, our_cano_list, datetime.datetime(2010, 1, 1))
+        news_list = get_news_list(
+            youtuber, our_cano_list, datetime.datetime(2010, 1, 1))
         for news in news_list:
             News.objects.create(
                 yno=youtuber,
@@ -306,7 +330,8 @@ def make_new_youtuber(request, url):
 
     # 12.  community 테이블 수집 후 DB 추가
     try:
-        get_daumCafe_search_result(youtuber, our_cano_list,  datetime.datetime(2010, 1, 1))
+        get_daumCafe_search_result(
+            youtuber, our_cano_list,  datetime.datetime(2010, 1, 1))
     except Exception as e:
         print('*ERROR (10) : ', e)
         youtuber.delete()
@@ -335,7 +360,8 @@ def make_new_youtuber(request, url):
     # 14. 위에서 생성된 정보들 기반으로 스텟, 등급 계산
     last_month_trend = None
     try:
-        now = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=9)
+        now = datetime.datetime.now(
+            datetime.timezone.utc) + datetime.timedelta(hours=9)
         trends = Trend.objects.filter(yno=youtuber).order_by('-recorddate')
         for trend in trends:
             last_month_trend = trend
@@ -356,16 +382,12 @@ def make_new_youtuber(request, url):
 
     try:
         stat_influence = get_influence(youtuber)
-        print('stat_influence')
         stat_activity = get_activity(youtuber, video_detail_list)
-        print('get_activity')
         stat_trend = get_trend(youtuber, last_month_trend, today_trend)
-        print('get_trend')
         stat_views = get_views(youtuber, last_month_trend, today_trend)
-        print('get_views')
         stat_charm = get_charm(video_detail_list)
-        print('get_charm')
-        grade = get_grade(youtuber, stat_influence, stat_activity, stat_trend, stat_views, stat_charm)
+        grade = get_grade(youtuber, stat_influence,
+                          stat_activity, stat_trend, stat_views, stat_charm)
         print('get_grade')
     except Exception as e:
         print('* Exception :', e)
@@ -375,7 +397,8 @@ def make_new_youtuber(request, url):
     print('*-----------------------------------------------------------*')
     print('| Influence |  Activity |     Trend |     Views |     Charm |')
     print('*-----------------------------------------------------------*')
-    print('| %9d | %9d | %9d | %9d | %9d |' % (stat_influence, stat_activity, stat_trend, stat_views, stat_charm))
+    print('| %9d | %9d | %9d | %9d | %9d |' %
+          (stat_influence, stat_activity, stat_trend, stat_views, stat_charm))
     print('*--------------------- Grade : %3d -------------------------*\n' % grade)
     youtuber.status = 100
     youtuber.save()
@@ -390,19 +413,18 @@ def make_new_youtuber(request, url):
                 words_count[tag] += 1
             else:
                 words_count[tag] = 1
-                
-    delete_words = [] # 1개 이하를 지운다.
-    for word, count in words_count.items(): 
+
+    delete_words = []  # 1개 이하를 지운다.
+    for word, count in words_count.items():
         if count <= 1:
             delete_words.append(word)
     for delete_word in delete_words:
         del words_count[delete_word]
-        
+
     result = json.dumps(words_count, ensure_ascii=False) if words_count else ''
     youtuber.tagcloud = result
     youtuber.save()
     print('{}. tag cloud is added.'.format(len(timer)))
-
 
     # 16. 유튜버의 스텟, 등급, updatedDate 갱신
     try:
@@ -412,9 +434,10 @@ def make_new_youtuber(request, url):
         youtuber.viewcounttrend = stat_views
         youtuber.subscribercounttrend = stat_trend
         youtuber.charm = stat_charm
-        youtuber.grade = grade 
+        youtuber.grade = grade
         youtuber.updateddat = now
-        print('*---------------------- Total : %.2f s----------------------*' % (timeit.default_timer() - timer[0]))
+        print('*---------------------- Total : %.2f s----------------------*' %
+              (timeit.default_timer() - timer[0]))
         res['code'] = 0
         res['yno'] = yno
         time.sleep(1.5)
@@ -429,6 +452,7 @@ def make_new_youtuber(request, url):
     #-------------------------------------------------------------------------------------------------------------------------#
 #*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*#
 #-------------------------------------------------------------------------------------------------------------------------#
+
 
 def yno_from_url(request, url):
     res = {}
@@ -446,8 +470,9 @@ def yno_from_url(request, url):
 def status_from_yno(request, yno):
     res = {}
     res['status'] = Youtuber.objects.get(yno=yno).status
-    res['subscriber'] =  Youtuber.objects.get(yno=yno).subscriber
+    res['subscriber'] = Youtuber.objects.get(yno=yno).subscriber
     return HttpResponse(json.dumps(res))
+
 
 def update_stat_without_request():
     youtube_list = Youtuber.objects.all()
@@ -463,7 +488,8 @@ def update_stat_without_request():
             temp['good'] = video.good
             temp['bad'] = video.bad
             video_detail_list.append(temp)
-        now = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=9)
+        now = datetime.datetime.now(
+            datetime.timezone.utc) + datetime.timedelta(hours=9)
         trends = Trend.objects.filter(yno=youtuber).order_by('-recorddate')
         last_month_trend = None
         for trend in trends:
@@ -474,9 +500,13 @@ def update_stat_without_request():
 
         youtuber.influence = get_influence(youtuber)
         youtuber.activity = get_activity3(youtuber, video_detail_list)
-        youtuber.viewcounttrend = get_views(youtuber, last_month_trend, today_trend)
-        youtuber.subscribercounttrend = get_trend(youtuber, last_month_trend, today_trend)
+        youtuber.viewcounttrend = get_views(
+            youtuber, last_month_trend, today_trend)
+        youtuber.subscribercounttrend = get_trend(
+            youtuber, last_month_trend, today_trend)
         youtuber.charm = get_charm(video_detail_list)
-        youtuber.grade = get_grade(youtuber, youtuber.influence, youtuber.activity, youtuber.subscribercounttrend, youtuber.viewcounttrend, youtuber.charm)
+        youtuber.grade = get_grade(youtuber, youtuber.influence, youtuber.activity,
+                                   youtuber.subscribercounttrend, youtuber.viewcounttrend, youtuber.charm)
         youtuber.save()
-        print('| %9d | %9d | %9d | %9d | %9d | %9d |' % (youtuber.yno, youtuber.influence, youtuber.activity, youtuber.subscribercounttrend, youtuber.viewcounttrend, youtuber.charm))
+        print('| %9d | %9d | %9d | %9d | %9d | %9d |' % (youtuber.yno, youtuber.influence,
+                                                         youtuber.activity, youtuber.subscribercounttrend, youtuber.viewcounttrend, youtuber.charm))

@@ -87,7 +87,7 @@ def get_channel_other_sites(input_url):
 def get_trend_list(channel_id):
     trends = []
     str_date = (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=9) + datetime.timedelta(days=-30)).strftime('%Y-%m-%d')
-    url = 'https://en.noxinfluencer.com/api/youtube/detail/dimension/?channelId=' + channel_id + '&&startDate=' + str_date
+    url = 'https://en.noxinfluencer.com/api/youtube/detail/dimension/?channelId=' + channel_id + '&startDate=' + str_date
     r = requests.get(url)
     html = json.loads(r.text)['retData']['dom']
     if json.loads(r.text)['errorNum'] != 0:
@@ -418,7 +418,6 @@ def get_our_cano(ycano_list, video_detail_list):
                         count_kids += 1
             for keyword in ['mukbang', '먹방', '음식', 'food', '맛있']:
                 for video_detail in video_detail_list:
-                    print('keyword : %s, title : %s, result : %s' % (keyword, video_detail['videoName'].lower(), keyword in video_detail['videoName'].lower()))
                     if keyword in video_detail['videoName'].lower():
                         count_muk += 1
             if count_kids >= len(video_detail_list) * 0.2:

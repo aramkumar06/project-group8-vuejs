@@ -52,7 +52,7 @@ def get_views(youtuber, last_month_trend, today_trend):
     if last_month_trend == None:
         value = 0
     else:
-        value = (int(today_trend.pointview) - int(last_month_trend.pointview))/int(last_month_trend.pointview) * math.log(int(youtuber.subscriber))
+        value = (int(today_trend.pointview) - int(last_month_trend.pointview))/max(int(last_month_trend.pointview),1) * math.log(int(youtuber.subscriber))
     Stat.objects.create(
         yno=youtuber,
         kinds=4,
